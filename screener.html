@@ -87,15 +87,15 @@ function Table({ title, note, rows, columns }) {
 function Explanation() {
   return h('div', {className:'explain'}, [
     h('h3', {}, 'How stocks are selected – Three Pillars'),
-    h('p', {}, '1. <strong>Macro</strong> – We only act when commodities are historically cheap relative to stocks and gold. This ensures we’re not buying at a cycle peak.'),
-    h('p', {}, '2. <strong>Sector</strong> – We look for sectors that are “hated” – trading well below their 5‑ and 10‑year highs. This is where the biggest turnarounds often begin.'),
-    h('p', {}, '3. <strong>Stock</strong> – Within those sectors, we filter companies with:'),
-    h('p', {}, '• <strong>Positive gross margin</strong> – they make money on each unit sold.'),
-    h('p', {}, '• <strong>Debt/Equity ≤ 200</strong> – not overloaded with debt (cyclical companies can handle more).'),
-    h('p', {}, '• <strong>Dilution ≤ 25%</strong> – not issuing too many new shares.'),
-    h('p', {}, '• <strong>Valuation</strong> – P/B ≤ 10, EV/EBITDA ≤ 50, P/E ≤ 100 (loose bounds to catch turnarounds).'),
-    h('p', {}, 'Then we wait for a <strong>technical entry</strong>: price above 50‑ and 200‑day moving averages, golden cross (50 > 200), and RSI under 70 (not overbought).'),
-    h('p', {}, 'The table below shows the stocks that passed all filters. The metrics you see (Gross Margin, Debt/Equity, etc.) are the exact values that determined the pass.'),
+    h('p', {dangerouslySetInnerHTML: {__html: '1. <strong>Macro</strong> – We only act when commodities are historically cheap relative to stocks and gold. This ensures we\'re not buying at a cycle peak.'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: '2. <strong>Sector</strong> – We look for sectors that are “hated” – trading well below their 5‑ and 10‑year highs. This is where the biggest turnarounds often begin.'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: '3. <strong>Stock</strong> – Within those sectors, we filter companies with:'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Positive gross margin</strong> – they make money on each unit sold.'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Debt/Equity ≤ 200</strong> – not overloaded with debt (cyclical companies can handle more).'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Dilution ≤ 25%</strong> – not issuing too many new shares.'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Valuation</strong> – P/B ≤ 10, EV/EBITDA ≤ 50, P/E ≤ 100 (loose bounds to catch turnarounds).'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: 'Then we wait for a <strong>technical entry</strong>: price above 50‑ and 200‑day moving averages, golden cross (50 > 200), and RSI under 70 (not overbought).'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: 'The table below shows the stocks that passed all filters. The metrics you see (Gross Margin, Debt/Equity, etc.) are the exact values that determined the pass.'}}),
   ]);
 }
 
