@@ -19,10 +19,14 @@ def run(force_macro=False):
     db.init_db()
     cfg = load_config()
 
+    # Debug: print the top-level keys to see what's loaded
+    print("Config keys:", list(cfg.keys()))
+
     # Macro params
-    macro_lookback = cfg["macro"].get("lookback_years", 25)
-    macro_threshold = cfg["macro"].get("cheap_percentile", 20)
-    gold_sp_threshold = cfg["macro"].get("gold_sp_percentile", 20)
+    macro_cfg = cfg.get("macro", {})
+    macro_lookback = macro_cfg.get("lookback_years", 25)
+    macro_threshold = macro_cfg.get("cheap_percentile", 20)
+    gold_sp_threshold = macro_cfg.get("gold_sp_percentile", 20)
 
     # 1. Macro check
     macro_status = macro.macro_status(lookback_years=macro_lookback,
@@ -41,7 +45,22 @@ def run(force_macro=False):
     print("MACRO PASS: Conditions met.")
 
     # 2. Sector screening
-    sectors_cfg = cfg["sectors"]
+    sectors_cfg = cfg.get("sectors")
+    if sectors_cfg is None:
+        print("ERROR: 'sectors' key not found in config. Please check config/screener.yaml")
+        print("Config keys:", list(cfg.keys()))
+        return
+
+    # If sectors_cfg is a dict (old format), convert to list
+    if isinstance(sectors_cfg, dict):
+        # assume it's a dict with sector names as keys, values as configs
+        sectors_cfg = [{"name": k, **v} for k, v in sectors_cfg.items()]
+
+    # Ensure we have a list
+    if not isinstance(sectors_cfg, list):
+        print("ERROR: 'sectors' should be a list. Got:", type(sectors_cfg))
+        return
+
     sector_params = cfg.get("screening", {}).get("sector", {})
     use_percentile = sector_params.get("use_percentile", True)
     percentile_threshold = sector_params.get("percentile_threshold", 30)
@@ -50,7 +69,10 @@ def run(force_macro=False):
 
     qualifying_sectors = []
     for s in sectors_cfg:
-        etf = s["etf"]
+        etf = s.get("etf")
+        if not etf:
+            print(f"WARNING: Sector entry missing 'etf': {s}")
+            continue
         pass_sector, stats = sector.sector_screen(
             etf,
             use_percentile=use_percentile,
@@ -60,10 +82,10 @@ def run(force_macro=False):
             debug=True
         )
         if pass_sector:
-            print(f"SECTOR PASS: {s['name']} ({etf})")
+            print(f"SECTOR PASS: {s.get('name', etf)} ({etf})")
             qualifying_sectors.append(s)
         else:
-            print(f"SECTOR FAIL: {s['name']} ({etf})")
+            print(f"SECTOR FAIL: {s.get('name', etf)} ({etf})")
 
     if not qualifying_sectors:
         print("No qualifying sectors. Exiting.")
@@ -73,7 +95,7 @@ def run(force_macro=False):
     screening_cfg = cfg.get("screening", {})
     results = []
     for sector_cfg in qualifying_sectors:
-        sector_name = sector_cfg["name"]
+        sector_name = sector_cfg.get("name", sector_cfg.get("etf", "Unknown"))
         commodity_ticker = sector_cfg.get("commodity_ticker")
         if commodity_ticker:
             rows = data_fetcher.fetch_price_history(commodity_ticker)
@@ -81,7 +103,12 @@ def run(force_macro=False):
         else:
             current_spot = 1.0
 
-        for ticker in sector_cfg["stocks"]:
+        stocks = sector_cfg.get("stocks", [])
+        if not stocks:
+            print(f"WARNING: No stocks defined for sector {sector_name}")
+            continue
+
+        for ticker in stocks:
             # Fetch fundamentals (cached)
             fund = data_fetcher.fetch_fundamentals(ticker)
             if fund:
