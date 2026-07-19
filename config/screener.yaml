@@ -1,5 +1,5 @@
 # ==============================================================================
-# Value Screener – Configuration
+# Value Screener – Configuration (Cleaned Tickers)
 # ==============================================================================
 
 macro:
@@ -10,7 +10,6 @@ macro:
   cheap_percentile: 25
   gold_sp_percentile: 20
 
-# ------------------------------------------------------------------ sectors --
 sectors:
   # ---- Energy ----
   - name: "Energy (S&P)"
@@ -26,12 +25,12 @@ sectors:
   - name: "Oil Services"
     etf: "OIH"
     commodity_ticker: "CL=F"
-    stocks: ["SLB", "HAL", "BHGE", "NOV", "CHX", "WFT"]
+    stocks: ["SLB", "HAL", "BHGE", "NOV", "CHX"]
 
   - name: "Oil Equipment"
     etf: "IEZ"
     commodity_ticker: "CL=F"
-    stocks: ["SLB", "HAL", "NOV", "WFT", "CHX"]
+    stocks: ["SLB", "HAL", "NOV", "CHX"]
 
   - name: "Midstream Pipelines"
     etf: "AMLP"
@@ -78,27 +77,27 @@ sectors:
   - name: "Silver Miners"
     etf: "SIL"
     commodity_ticker: "SI=F"
-    stocks: ["AG", "PAAS", "FSM", "GPL", "HL", "CDE"]
+    stocks: ["AG", "PAAS", "FSM", "HL", "CDE"]
 
   - name: "Junior Silver Miners"
     etf: "SILJ"
     commodity_ticker: "SI=F"
-    stocks: ["AG", "PAAS", "FSM", "GPL", "HL"]
+    stocks: ["AG", "PAAS", "FSM", "HL"]
 
   - name: "Gold Miners"
     etf: "GDX"
     commodity_ticker: "GC=F"
-    stocks: ["NEM", "GOLD", "ABX", "AEM", "KGC", "IAG", "YRI"]
+    stocks: ["NEM", "GOLD", "ABX", "AEM", "KGC", "IAG"]
 
   - name: "Junior Gold Miners"
     etf: "GDXJ"
     commodity_ticker: "GC=F"
-    stocks: ["KGC", "IAG", "YRI", "GPL", "HL", "CDE"]
+    stocks: ["KGC", "IAG", "HL", "CDE"]
 
   - name: "Junior Gold Explorers"
     etf: "GOEX"
     commodity_ticker: "GC=F"
-    stocks: ["KGC", "IAG", "YRI", "GPL", "HL"]
+    stocks: ["KGC", "IAG", "HL"]
 
   - name: "Rare Earths"
     etf: "REMX"
@@ -108,7 +107,7 @@ sectors:
   - name: "Lithium"
     etf: "LIT"
     commodity_ticker: null
-    stocks: ["ALB", "SQM", "LAC", "PLL", "SGML", "LTHM"]
+    stocks: ["ALB", "SQM", "LAC", "PLL", "SGML"]
 
   - name: "Battery Materials"
     etf: "BATT"
@@ -154,7 +153,7 @@ sectors:
   - name: "Timber & Forestry"
     etf: "WOOD"
     commodity_ticker: "LBR=F"
-    stocks: ["WY", "WPC", "RYN", "PCH"]
+    stocks: ["WY", "WPC", "RYN"]
 
   # ---- Materials ----
   - name: "Materials (S&P)"
@@ -186,23 +185,12 @@ sectors:
   - name: "Solar"
     etf: "TAN"
     commodity_ticker: null
-    stocks: ["ENPH", "SEDG", "FSLR", "CSIQ", "SPWR", "RUN"]
+    stocks: ["ENPH", "SEDG", "FSLR", "CSIQ", "RUN"]
 
   - name: "Water Resources"
     etf: "PHO"
     commodity_ticker: null
-    stocks: ["XYL", "AWK", "WTRG", "AWR", "CNI"]
-
-  # ---- Rates (commodity hedges) ----
-  - name: "20+ Year Treasuries"
-    etf: "TLT"
-    commodity_ticker: "GC=F"
-    stocks: ["TLT"]
-
-  - name: "Inflation-Protected Treasuries"
-    etf: "TIP"
-    commodity_ticker: "GC=F"
-    stocks: ["TIP"]
+    stocks: ["XYL", "AWK", "WTRG", "AWR"]
 
   # ---- Country ETFs as commodity plays ----
   - name: "Canada (Commodity)"
@@ -233,32 +221,20 @@ sectors:
 # ------------------------------------------------------------------ screening --
 screening:
   min_years_history: 10
-
-  # ---- Debt & Solvency ----
   debt_equity_max: 3.0
-  current_ratio_min: 1.0
-  interest_coverage_min: 3.0
-
-  # ---- Value Metrics ----
   pb_max: 3.0
   ev_ebitda_max: 15.0
   pe_max: 25.0
   pfcf_max: 30.0
   roe_min: 0.10
   fcf_yield_min: 0.04
-
-  # ---- Dilution ----
   dilution_max: 0.05
-
-  # ---- Technical ----
   technical:
     short_sma: 50
     long_sma: 200
     volume_multiplier: 1.5
     rsi_oversold: 30
     rsi_overbought: 70
-
-  # ---- Sector Screening ----
   sector:
     use_percentile: true
     percentile_threshold: 30
