@@ -1,15 +1,10 @@
 """
-Macro check: compare BCOM/SP500 and BCOM/Gold percentiles.
+Macro check: compare BCOM/SP500, BCOM/Gold, and Gold/SP500.
 """
 import pandas as pd
-import numpy as np
-from . import data_fetcher, db
+from . import data_fetcher
 
-def get_macro_data(commodity_ticker="GSG", stock_ticker="^GSPC", gold_ticker="GC=F", lookback_years=25):
-    """
-    Fetch monthly data for the three series and compute the two ratios.
-    Returns (ratio1 Series, ratio2 Series, common_dates Index) or (None, None, None).
-    """
+def get_macro_data(commodity_ticker="^BCOM", stock_ticker="^GSPC", gold_ticker="GC=F", lookback_years=25):
     end = pd.Timestamp.today()
     start = end - pd.DateOffset(years=lookback_years)
     start_str = start.strftime("%Y-%m-%d")
@@ -26,35 +21,40 @@ def get_macro_data(commodity_ticker="GSG", stock_ticker="^GSPC", gold_ticker="GC
     gold = get_monthly(gold_ticker)
 
     if bcom.empty or spx.empty or gold.empty:
-        return None, None, None
+        return None, None, None, None
 
     common = bcom.index.intersection(spx.index).intersection(gold.index)
-    if len(common) < 60:  # at least 5 years of monthly data
-        return None, None, None
+    if len(common) < 60:
+        return None, None, None, None
 
     bcom = bcom[common]
     spx = spx[common]
     gold = gold[common]
-    ratio1 = bcom / spx
-    ratio2 = bcom / gold
-    return ratio1, ratio2, common
+
+    ratio_bcom_sp = bcom / spx
+    ratio_bcom_gold = bcom / gold
+    ratio_gold_sp = gold / spx
+
+    return ratio_bcom_sp, ratio_bcom_gold, ratio_gold_sp, common
 
 
-def macro_status(lookback_years=25, cheap_threshold=25):
-    """
-    Evaluate the macro condition.
-    Returns a dict with 'pass' (bool), 'bcom_sp_pct' (float),
-    'bcom_gold_pct' (float), and optionally 'error'.
-    """
-    r1, r2, _ = get_macro_data(lookback_years=lookback_years)
+def macro_status(lookback_years=25, cheap_threshold=25, gold_sp_threshold=20):
+    r1, r2, r3, _ = get_macro_data(lookback_years=lookback_years)
     if r1 is None:
-        return {"pass": False, "error": "Insufficient data for macro analysis"}
-    # Compute current percentile (lower is cheaper)
-    pct1 = r1.rank(pct=True).iloc[-1] * 100
-    pct2 = r2.rank(pct=True).iloc[-1] * 100
-    # Both must be below the cheap_percentile threshold
+        return {"pass": False, "error": "Insufficient data"}
+
+    pct_bcom_sp = r1.rank(pct=True).iloc[-1] * 100
+    pct_bcom_gold = r2.rank(pct=True).iloc[-1] * 100
+    pct_gold_sp = r3.rank(pct=True).iloc[-1] * 100
+
+    # Conditions: commodities cheap vs stocks AND vs gold, AND gold not too expensive vs stocks
+    macro_pass = (pct_bcom_sp <= cheap_threshold and
+                  pct_bcom_gold <= cheap_threshold and
+                  pct_gold_sp >= gold_sp_threshold)   # gold cheap vs stocks?
+
     return {
-        "pass": (pct1 <= cheap_threshold and pct2 <= cheap_threshold),
-        "bcom_sp_pct": float(pct1),
-        "bcom_gold_pct": float(pct2)
+        "pass": macro_pass,
+        "bcom_sp_pct": float(pct_bcom_sp),
+        "bcom_gold_pct": float(pct_bcom_gold),
+        "gold_sp_pct": float(pct_gold_sp)
     }
