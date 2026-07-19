@@ -7,6 +7,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import yaml
+import argparse
 from datetime import datetime, timezone
 from lib import db, macro, sector, stock, technical, data_fetcher
 
@@ -14,18 +15,23 @@ def load_config(path="config/screener.yaml"):
     with open(path) as f:
         return yaml.safe_load(f)
 
-def run():
+def run(force_macro=False):
     db.init_db()
     cfg = load_config()
-
+    macro_lookback = cfg["macro"].get("lookback_years", 25)
+    macro_threshold = cfg["macro"].get("cheap_percentile", 20)
+    
     # 1. Macro check
-    macro_status = macro.macro_status()
-    if not macro_status["pass"]:
+    macro_status = macro.macro_status(lookback_years=macro_lookback, cheap_threshold=macro_threshold)
+    if force_macro:
+        macro_status["pass"] = True
+        print("MACRO OVERRIDE: Forcing macro pass for testing.")
+    elif not macro_status["pass"]:
         print("MACRO: Commodities are not historically cheap. Holding cash.")
         print(f"BCOM/SP500 percentile: {macro_status['bcom_sp_pct']:.1f}%")
         print(f"BCOM/Gold percentile: {macro_status['bcom_gold_pct']:.1f}%")
         return
-
+    
     print("MACRO PASS: Commodities are cheap relative to stocks and gold.")
     
     # 2. Sector scan
@@ -33,7 +39,7 @@ def run():
     qualifying_sectors = []
     for s in sectors_cfg:
         etf = s["etf"]
-        pass_sector, stats = sector.sector_screen(etf)
+        pass_sector, stats = sector.sector_screen(etf, debug=True)
         if pass_sector:
             print(f"SECTOR PASS: {s['name']} ({etf}) – trading below 70% of 5y high and 80% of 10y high.")
             qualifying_sectors.append(s)
@@ -45,22 +51,19 @@ def run():
         return
     
     # 3. Stock-level screening
-    # For each qualifying sector, get its stocks and screen them
     results = []
     for sector_cfg in qualifying_sectors:
         sector_name = sector_cfg["name"]
-        # get commodity spot price (we use the sector's primary commodity price)
-        # For simplicity, we assume the commodity ticker is the same as the sector's ETF? Actually we need a spot price.
-        # We'll fetch the price of the first commodity in our list (or use a placeholder).
-        # In practice, you'd map each sector to a commodity ticker (e.g., uranium -> URA? but we need spot price).
-        # For demonstration, we'll use the sector ETF price as proxy (not ideal).
-        # Better: add commodity ticker in config.
-        commodity_ticker = sector_cfg.get("commodity_ticker", etf)  # fallback
-        rows = data_fetcher.fetch_price_history(commodity_ticker, end_date=datetime.today().strftime("%Y-%m-%d"))
-        if rows:
-            current_spot = rows[-1][1]
+        # get commodity spot price if available
+        commodity_ticker = sector_cfg.get("commodity_ticker")
+        if commodity_ticker:
+            rows = data_fetcher.fetch_price_history(commodity_ticker)
+            if rows:
+                current_spot = rows[-1][1]
+            else:
+                current_spot = 1.0
         else:
-            current_spot = 1.0  # fallback
+            current_spot = 1.0
         
         for ticker in sector_cfg["stocks"]:
             # fetch fundamentals (will cache)
@@ -100,4 +103,7 @@ def run():
     print(f"Screener completed. {len(results)} stocks flagged as BUY.")
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--force-macro", action="store_true", help="Ignore macro condition for testing")
+    args = parser.parse_args()
+    run(force_macro=args.force_macro)
