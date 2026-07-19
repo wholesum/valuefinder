@@ -37,7 +37,6 @@ def get_macro_data(commodity_ticker="^BCOM", stock_ticker="^GSPC", gold_ticker="
 
     return ratio_bcom_sp, ratio_bcom_gold, ratio_gold_sp, common
 
-
 def macro_status(lookback_years=25, cheap_threshold=25, gold_sp_threshold=20):
     r1, r2, r3, _ = get_macro_data(lookback_years=lookback_years)
     if r1 is None:
@@ -47,10 +46,9 @@ def macro_status(lookback_years=25, cheap_threshold=25, gold_sp_threshold=20):
     pct_bcom_gold = r2.rank(pct=True).iloc[-1] * 100
     pct_gold_sp = r3.rank(pct=True).iloc[-1] * 100
 
-    # Conditions: commodities cheap vs stocks AND vs gold, AND gold not too expensive vs stocks
     macro_pass = (pct_bcom_sp <= cheap_threshold and
                   pct_bcom_gold <= cheap_threshold and
-                  pct_gold_sp >= gold_sp_threshold)   # gold cheap vs stocks?
+                  pct_gold_sp >= gold_sp_threshold)
 
     return {
         "pass": macro_pass,
