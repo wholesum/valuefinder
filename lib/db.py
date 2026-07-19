@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS screener_results (
     cost_pass   INTEGER,
     debt_pass   INTEGER,
     dilution_pass INTEGER,
+    dilution_value REAL,           -- store the actual dilution %
     value_pass  INTEGER,
     technical_pass INTEGER,
     final_score REAL,
@@ -81,6 +82,8 @@ def init_db():
         # For screener_results
         for col in ['sector_pass', 'value_pass', 'cost_pass', 'debt_pass', 'dilution_pass', 'technical_pass', 'recommendation']:
             _add_column_if_not_exists(conn, "screener_results", col, "INTEGER" if col != 'recommendation' else "TEXT")
+        # Add dilution_value column if missing
+        _add_column_if_not_exists(conn, "screener_results", "dilution_value", "REAL")
 
 # ---------------------------------------------------------------- prices ---
 def delete_prices_before(cutoff_date: str):
@@ -171,14 +174,14 @@ def save_result(result):
         conn.execute(
             """INSERT OR REPLACE INTO screener_results
                (ticker, sector, macro_pass, sector_pass, cost_pass, debt_pass,
-                dilution_pass, value_pass, technical_pass, final_score,
+                dilution_pass, dilution_value, value_pass, technical_pass, final_score,
                 recommendation, last_updated)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (result["ticker"], result["sector"],
              int(result["macro_pass"]), int(result["sector_pass"]),
              int(result["cost_pass"]), int(result["debt_pass"]),
-             int(result["dilution_pass"]), int(result["value_pass"]),
-             int(result["technical_pass"]),
+             int(result["dilution_pass"]), result.get("dilution_value"),
+             int(result["value_pass"]), int(result["technical_pass"]),
              result["final_score"], result["recommendation"],
              result["last_updated"])
         )
