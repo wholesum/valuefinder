@@ -23,9 +23,9 @@ def sector_screen(etf_ticker, min_years=5):
     cutoff_10y = s.index[-1] - pd.DateOffset(years=10)
     s_10y = s[s.index >= cutoff_10y]
     high_10y = s_10y.max()
-    # thresholds: current < 70% of 5y high, and < 80% of 10y high
-    pass_5y = (current / high_5y) < 0.70 if not pd.isna(high_5y) else False
-    pass_10y = (current / high_10y) < 0.80 if not pd.isna(high_10y) else False
+    # thresholds: current < 80% of 5y high, and < 85% of 10y high
+    pass_5y = (current / high_5y) < 0.80 if not pd.isna(high_5y) else False
+    pass_10y = (current / high_10y) < 0.85 if not pd.isna(high_10y) else False
     return pass_5y and pass_10y, {
         "current": current,
         "high_5y": high_5y,
