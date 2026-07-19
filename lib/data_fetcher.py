@@ -1,5 +1,5 @@
 """
-Centralised data fetcher – now uses yfinance only (Stooq is blocked on PythonAnywhere).
+Centralised data fetcher – uses yfinance with curl_cffi session.
 """
 import pandas as pd
 from datetime import datetime
