@@ -6,38 +6,46 @@ import time
 import pandas as pd
 import yfinance as yf
 
-# Disable custom session – use yfinance's default
-_SESSION = None
-
-def fetch_history(ticker: str, period: str = "max", start_date: str = None, retries: int = 2, pause: float = 2.0):
+def fetch_history(ticker: str, start_date: str = None, retries: int = 3, pause: float = 2.0):
     """
-    start_date: "YYYY-MM-DD" -- fetches from that date forward.
+    Fetch historical daily closes. start_date: "YYYY-MM-DD".
+    Returns list of (date_str, close) or None on failure.
     """
-    for attempt in range(retries + 1):
+    for attempt in range(retries):
         try:
-            if start_date:
-                kwargs = dict(start=start_date, interval="1d", progress=False, timeout=30, auto_adjust=True)
-            else:
-                kwargs = dict(period=period, interval="1d", progress=False, timeout=30, auto_adjust=True)
-            # Do not pass session – let yfinance use its own
-            data = yf.download(ticker, **kwargs)
-            if data is None or data.empty:
+            # Use auto_adjust=True to get adjusted closes – helps with timezone issues
+            data = yf.download(ticker, period="max", interval="1d", progress=False, auto_adjust=True)
+            if data.empty:
                 raise ValueError("empty response")
-            # Use 'Adj Close' if available, else 'Close'
-            close = data.get("Adj Close")
+
+            # Use 'Close' column (auto_adjust=True gives 'Close' as adjusted)
+            close = data.get("Close")
             if close is None:
-                close = data.get("Close")
+                close = data.get("Adj Close")
             if close is None:
                 raise ValueError("no close column")
+
+            # Ensure it's a Series (not DataFrame)
             if isinstance(close, pd.DataFrame):
                 close = close.iloc[:, 0]
+
             close = close.dropna()
             if close.empty:
                 raise ValueError("no closes")
+
+            # Filter by start_date if provided
+            if start_date:
+                close = close[close.index >= pd.to_datetime(start_date)]
+
+            if close.empty:
+                return []
+
             return list(zip(close.index.strftime("%Y-%m-%d"), close.values.tolist()))
+
         except Exception as e:
-            if attempt < retries:
-                time.sleep(pause)
+            print(f"  yfinance attempt {attempt+1}/{retries} failed for {ticker}: {e}")
+            if attempt < retries - 1:
+                time.sleep(pause * (attempt + 1))  # exponential backoff
                 continue
             return None
     return None
