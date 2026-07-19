@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Main screener script. Runs macro, sector, and stock screens, then saves results.
+Main screener script – enhanced with all new metrics.
 """
 import sys
 import os
@@ -18,69 +18,96 @@ def load_config(path="config/screener.yaml"):
 def run(force_macro=False):
     db.init_db()
     cfg = load_config()
+
+    # Macro params
     macro_lookback = cfg["macro"].get("lookback_years", 25)
     macro_threshold = cfg["macro"].get("cheap_percentile", 20)
+    gold_sp_threshold = cfg["macro"].get("gold_sp_percentile", 20)
 
     # 1. Macro check
-    macro_status = macro.macro_status(lookback_years=macro_lookback, cheap_threshold=macro_threshold)
+    macro_status = macro.macro_status(lookback_years=macro_lookback,
+                                      cheap_threshold=macro_threshold,
+                                      gold_sp_threshold=gold_sp_threshold)
     if force_macro:
         macro_status["pass"] = True
         print("MACRO OVERRIDE: Forcing macro pass for testing.")
     elif not macro_status["pass"]:
-        print("MACRO: Commodities are not historically cheap. Holding cash.")
+        print("MACRO: Conditions not met. Holding cash.")
         print(f"BCOM/SP500 percentile: {macro_status['bcom_sp_pct']:.1f}%")
         print(f"BCOM/Gold percentile: {macro_status['bcom_gold_pct']:.1f}%")
+        print(f"Gold/SP500 percentile: {macro_status['gold_sp_pct']:.1f}%")
         return
 
-    print("MACRO PASS: Commodities are cheap relative to stocks and gold.")
+    print("MACRO PASS: Conditions met.")
 
-    # 2. Sector scan
+    # 2. Sector screening
     sectors_cfg = cfg["sectors"]
+    sector_params = cfg.get("screening", {}).get("sector", {})
+    use_percentile = sector_params.get("use_percentile", True)
+    percentile_threshold = sector_params.get("percentile_threshold", 30)
+    pct_5y = sector_params.get("pct_of_5y_high", 0.70)
+    pct_10y = sector_params.get("pct_of_10y_high", 0.80)
+
     qualifying_sectors = []
     for s in sectors_cfg:
         etf = s["etf"]
-        pass_sector, stats = sector.sector_screen(etf, debug=True)
+        pass_sector, stats = sector.sector_screen(
+            etf,
+            use_percentile=use_percentile,
+            percentile_threshold=percentile_threshold,
+            pct_of_5y_high=pct_5y,
+            pct_of_10y_high=pct_10y,
+            debug=True
+        )
         if pass_sector:
-            print(f"SECTOR PASS: {s['name']} ({etf}) – trading below 70% of 5y high and 80% of 10y high.")
+            print(f"SECTOR PASS: {s['name']} ({etf})")
             qualifying_sectors.append(s)
         else:
-            print(f"SECTOR FAIL: {s['name']} ({etf}) – not 'hated' enough.")
+            print(f"SECTOR FAIL: {s['name']} ({etf})")
 
     if not qualifying_sectors:
         print("No qualifying sectors. Exiting.")
         return
 
-    # 3. Stock-level screening
+    # 3. Stock screening
+    screening_cfg = cfg.get("screening", {})
     results = []
     for sector_cfg in qualifying_sectors:
         sector_name = sector_cfg["name"]
         commodity_ticker = sector_cfg.get("commodity_ticker")
         if commodity_ticker:
             rows = data_fetcher.fetch_price_history(commodity_ticker)
-            if rows:
-                current_spot = rows[-1][1]
-            else:
-                current_spot = 1.0
+            current_spot = rows[-1][1] if rows else 1.0
         else:
             current_spot = 1.0
 
         for ticker in sector_cfg["stocks"]:
+            # Fetch fundamentals (cached)
             fund = data_fetcher.fetch_fundamentals(ticker)
             if fund:
                 db.upsert_fundamentals(ticker, fund)
-            shares = data_fetcher.fetch_shares_history(ticker)
+            data_fetcher.fetch_shares_history(ticker)
 
+            # Run stock filters
             stock_result = stock.screen_stock(ticker, sector_name, current_spot)
             if not stock_result["fundamental_pass"]:
-                print(f"STOCK FAIL (fundamental): {ticker} ({sector_name})")
                 continue
 
-            tech_pass, tech_stats = technical.technical_pass(ticker)
+            # Technical check
+            tech_params = screening_cfg.get("technical", {})
+            tech_pass, tech_stats = technical.technical_pass(
+                ticker,
+                short=tech_params.get("short_sma", 50),
+                long=tech_params.get("long_sma", 200),
+                volume_mult=tech_params.get("volume_multiplier", 1.5),
+                rsi_oversold=tech_params.get("rsi_oversold", 30),
+                rsi_overbought=tech_params.get("rsi_overbought", 70)
+            )
             if not tech_pass:
-                print(f"STOCK FAIL (technical): {ticker} ({sector_name})")
+                print(f"STOCK FAIL (technical): {ticker} ({sector_name}) – RSI: {tech_stats.get('rsi'):.1f}, golden_cross: {tech_stats.get('golden_cross')}")
                 continue
 
-            print(f"STOCK BUY: {ticker} ({sector_name}) – all screens passed.")
+            print(f"STOCK BUY: {ticker} ({sector_name})")
             results.append({
                 "ticker": ticker,
                 "sector": sector_name,
@@ -89,6 +116,7 @@ def run(force_macro=False):
                 "cost_pass": stock_result["cost_pass"],
                 "debt_pass": stock_result["debt_pass"],
                 "dilution_pass": stock_result["dilution_pass"],
+                "value_pass": stock_result["value_pass"],
                 "technical_pass": True,
                 "final_score": stock_result["value_score"] or 0,
                 "recommendation": "BUY",
