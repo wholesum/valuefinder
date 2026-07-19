@@ -1,21 +1,29 @@
 """
-Stock-level filters: cost, debt, dilution, value, and quality metrics.
+Stock-level filters with safe conversion for extreme values.
 """
-from . import data_fetcher, db
+from . import db
 
 def get_fund(ticker):
     return db.get_fundamentals(ticker)
 
+def safe_float(v):
+    """Convert to float, return None if not possible or inf/nan."""
+    if v is None:
+        return None
+    try:
+        f = float(v)
+        if not (f == float('inf') or f == float('-inf') or f != f):  # not nan
+            return f
+        return None
+    except (TypeError, ValueError):
+        return None
+
 def cost_filter(ticker, commodity_spot_price, margin_threshold=0.0):
     fund = get_fund(ticker)
     if fund is None:
-        return True, None   # missing data -> pass
-    gm = fund.get("gross_margin")
-    if gm is None:
         return True, None
-    try:
-        gm = float(gm)
-    except:
+    gm = safe_float(fund.get("gross_margin"))
+    if gm is None:
         return True, None
     return gm > margin_threshold, gm
 
@@ -23,12 +31,8 @@ def debt_filter(ticker, max_debt_equity=3.0):
     fund = get_fund(ticker)
     if fund is None:
         return True, None
-    debt_eq = fund.get("debt_ebitda")   # actually debt-to-equity
+    debt_eq = safe_float(fund.get("debt_ebitda"))
     if debt_eq is None:
-        return True, None
-    try:
-        debt_eq = float(debt_eq)
-    except:
         return True, None
     return debt_eq <= max_debt_equity, debt_eq
 
@@ -43,21 +47,11 @@ def dilution_filter(ticker, max_yoy=0.05):
     annual_growth = (newest / oldest) ** (1 / (len(shares_hist)/252)) - 1
     return annual_growth <= max_yoy, annual_growth
 
-def value_filter(ticker, pb_max=3.0, ev_ebitda_max=15.0, pe_max=25.0, pfcf_max=30.0,
-                 roe_min=0.10, fcf_yield_min=0.04):
+def value_filter(ticker, pb_max=3.0, ev_ebitda_max=15.0, pe_max=25.0,
+                 pfcf_max=30.0, roe_min=0.10, fcf_yield_min=0.04):
     fund = get_fund(ticker)
     if not fund:
-        return True, {}   # missing data -> pass
-
-    # Helper to convert to float, treat strings like "N/A" as None
-    def safe_float(val):
-        if val is None:
-            return None
-        try:
-            return float(val)
-        except (ValueError, TypeError):
-            return None
-
+        return True, {}
     pb = safe_float(fund.get("price_book"))
     ev = safe_float(fund.get("ev_ebitda"))
     pe = safe_float(fund.get("trailing_pe"))
@@ -88,7 +82,7 @@ def screen_stock(ticker, sector, commodity_spot_price):
     dil_pass, dil_val = dilution_filter(ticker)
     value_pass, value_metrics = value_filter(ticker)
 
-    # Value score (composite)
+    # Composite score
     score = 0
     count = 0
     if value_metrics.get("pb") is not None:
@@ -97,14 +91,10 @@ def screen_stock(ticker, sector, commodity_spot_price):
     if value_metrics.get("ev") is not None:
         score += value_metrics["ev"] / 15.0
         count += 1
-    if count > 0:
-        value_score = score / count
-    else:
-        value_score = None
+    value_score = score / count if count > 0 else None
 
     fundamental_pass = cost_pass and debt_pass and dil_pass and value_pass
 
-    # Debug
     if not fundamental_pass:
         reasons = []
         if not cost_pass:
@@ -114,7 +104,7 @@ def screen_stock(ticker, sector, commodity_spot_price):
         if not dil_pass:
             reasons.append(f"dilution (growth={dil_val})")
         if not value_pass:
-            reasons.append(f"value (pb={value_metrics.get('pb')}, ev={value_metrics.get('ev')}, pe={value_metrics.get('pe')}, pfcf={value_metrics.get('pfcf')}, roe={value_metrics.get('roe')}, fcf={value_metrics.get('fcf_yield')})")
+            reasons.append(f"value (pb={value_metrics.get('pb')}, ev={value_metrics.get('ev')}, pe={value_metrics.get('pe')})")
         print(f"  STOCK FAIL (fundamental): {ticker} – {', '.join(reasons)}")
 
     return {
