@@ -26,6 +26,7 @@
     .explain h3 { font-family:'Fraunces',serif; font-weight:500; font-size:16px; margin:0 0 8px; }
     .explain p { font-size:13px; line-height:1.6; color:var(--ink-muted); margin:4px 0; }
     .explain strong { color:var(--ink); }
+    .explain .highlight { color:var(--gold); }
     table.stock-table { width:100%; border-collapse:collapse; font-size:11px; }
     table.stock-table th { font-family:'IBM Plex Mono',monospace; font-size:8px; text-transform:uppercase; color:var(--ink-muted); text-align:left; padding:4px 6px; border-bottom:1px solid var(--hairline); cursor:pointer; user-select:none; }
     table.stock-table td { padding:4px 6px; border-bottom:1px solid var(--hairline); font-family:'IBM Plex Mono',monospace; font-size:10.5px; }
@@ -79,22 +80,22 @@ function Table({ title, note, rows, columns }) {
     h('table', {className:'stock-table', key:'table'}, [
       h('thead', {key:'thead'}, h('tr', {}, columns.map(c => h('th', {key:c.key}, c.header)))),
       h('tbody', {key:'tbody'}, rows.map((r, i) => h('tr', {key:i},
-        columns.map(c => h('td', {key:c.key}, c.render ? c.render(r) : r[c.key])))))
+        columns.map(c => h('td', {key:c.key}, c.render ? c.render(r) : r[c[key]])))))
     ])
   ]);
 }
 
 function Explanation() {
   return h('div', {className:'explain'}, [
-    h('h3', {}, 'How stocks are selected – Three Pillars'),
-    h('p', {dangerouslySetInnerHTML: {__html: '1. <strong>Macro</strong> – We only act when commodities are historically cheap relative to stocks and gold. This ensures we\'re not buying at a cycle peak.'}}),
-    h('p', {dangerouslySetInnerHTML: {__html: '2. <strong>Sector</strong> – We look for sectors that are “hated” – trading well below their 5‑ and 10‑year highs. This is where the biggest turnarounds often begin.'}}),
+    h('h3', {}, 'How stocks are selected – Three Pillars & Data Lookback'),
+    h('p', {dangerouslySetInnerHTML: {__html: '1. <strong>Macro</strong> – We only act when commodities are historically cheap relative to stocks and gold. <span class="highlight">(25 years of monthly data)</span> This ensures we’re not buying at a cycle peak.'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: '2. <strong>Sector</strong> – We look for sectors that are “hated” – trading well below their 5‑ and 10‑year highs. <span class="highlight">(5-year percentile, 5-year high, 10-year high – daily data)</span> This is where the biggest turnarounds often begin.'}}),
     h('p', {dangerouslySetInnerHTML: {__html: '3. <strong>Stock</strong> – Within those sectors, we filter companies with:'}}),
-    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Positive gross margin</strong> – they make money on each unit sold.'}}),
-    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Debt/Equity ≤ 200</strong> – not overloaded with debt (cyclical companies can handle more).'}}),
-    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Dilution ≤ 25%</strong> – not issuing too many new shares.'}}),
-    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Valuation</strong> – P/B ≤ 10, EV/EBITDA ≤ 50, P/E ≤ 100 (loose bounds to catch turnarounds).'}}),
-    h('p', {dangerouslySetInnerHTML: {__html: 'Then we wait for a <strong>technical entry</strong>: price above 50‑ and 200‑day moving averages, golden cross (50 > 200), and RSI under 70 (not overbought).'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Positive gross margin</strong> – they make money on each unit sold. <span class="highlight">(Latest reported)</span>'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Debt/Equity ≤ 200</strong> – not overloaded with debt (cyclical companies can handle more). <span class="highlight">(Latest reported)</span>'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Dilution ≤ 25% annual growth</strong> – not issuing too many new shares. <span class="highlight">(3 years of quarterly share count data)</span>'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: '• <strong>Valuation</strong> – P/B ≤ 10, EV/EBITDA ≤ 50, P/E ≤ 100 (loose bounds to catch turnarounds). <span class="highlight">(Latest reported)</span>'}}),
+    h('p', {dangerouslySetInnerHTML: {__html: 'Then we wait for a <strong>technical entry</strong>: price above 50‑ and 200‑day moving averages, golden cross (50 > 200), and RSI under 70 (not overbought). <span class="highlight">(50-day, 200-day SMAs; 14-day RSI – daily data)</span>'}}),
     h('p', {dangerouslySetInnerHTML: {__html: 'The table below shows the stocks that passed all filters. The metrics you see (Gross Margin, Debt/Equity, etc.) are the exact values that determined the pass.'}}),
   ]);
 }
