@@ -1,5 +1,5 @@
 # ==============================================================================
-# Value Screener – Configuration
+# Value Screener – Configuration (Final – All Sectors, Valid Tickers)
 # ==============================================================================
 
 macro:
@@ -11,7 +11,7 @@ macro:
   gold_sp_percentile: 20
 
 sectors:
-  # ---- Energy ----
+  # ======================== ENERGY ========================
   - name: "Energy (S&P)"
     etf: "XLE"
     commodity_ticker: "CL=F"
@@ -47,18 +47,18 @@ sectors:
     commodity_ticker: "CL=F"
     stocks: ["RIGD", "MPC", "VLO", "PSX", "PKN", "DINO", "WKC", "CVI", "PBF"]
 
-  # ---- Uranium ----
+  # ======================== URANIUM ========================
   - name: "Uranium (Global X)"
     etf: "URA"
     commodity_ticker: "URA"
-    stocks: ["CCJ", "OKLO", "NXE", "UEC", "SRUUF", "NATKY", "UUUU", "DNN", "URNM", "BSENF"]
+    stocks: ["CCJ", "OKLO", "NXE", "UEC", "SRUUF", "NATKY", "UUUU", "DNN", "URNM"]
 
   - name: "Uranium Miners (Sprott)"
     etf: "URNM"
     commodity_ticker: "URA"
-    stocks: ["CCJ", "NXE", "UEC", "SRUUF", "DNN", "PDN", "UUUU", "BSENF", "NATKY"]
+    stocks: ["CCJ", "NXE", "UEC", "SRUUF", "DNN", "PDN", "UUUU", "NATKY"]
 
-  # ---- Metals & Mining ----
+  # ======================== METALS & MINING ========================
   - name: "Metals & Mining"
     etf: "XME"
     commodity_ticker: "HG=F"
@@ -77,57 +77,57 @@ sectors:
   - name: "Silver Miners"
     etf: "SIL"
     commodity_ticker: "SI=F"
-    stocks: ["WPM", "PAAS", "CDE", "HL", "PE&OLES", "AG", "FSM", "SILV", "MAG"]
+    stocks: ["WPM", "PAAS", "CDE", "HL", "AG", "FSM", "EXK", "AYA", "SSRM"]
 
   - name: "Junior Silver Miners"
     etf: "SILJ"
     commodity_ticker: "SI=F"
-    stocks: ["HL", "AG", "BOL", "SSRM", "KGH", "CDE", "WPM", "EXK", "AYA", "HYMC"]
+    stocks: ["HL", "AG", "SSRM", "CDE", "WPM", "EXK", "AYA", "HYMC"]
 
   - name: "Gold Miners"
     etf: "GDX"
     commodity_ticker: "GC=F"
-    stocks: ["AEM", "NEM", "ABX", "WPM", "AU", "FNV", "KGC", "IAG", "YRI", "OR"]
+    stocks: ["AEM", "NEM", "ABX", "WPM", "AU", "FNV", "KGC", "IAG", "OR", "EQX"]
 
   - name: "Junior Gold Miners"
     etf: "GDXJ"
     commodity_ticker: "GC=F"
-    stocks: ["AGI", "EVN", "EQX", "CDE", "PE&OLES", "HL", "IAG", "KGC", "NG", "DRD"]
+    stocks: ["AGI", "EVN", "EQX", "CDE", "HL", "IAG", "KGC", "NG", "DRD", "SSRM"]
 
   - name: "Junior Gold Explorers"
     etf: "GOEX"
     commodity_ticker: "GC=F"
-    stocks: ["HL", "DPM", "CDE", "EGO", "SSRM", "EQX", "AGI", "OGC", "NG", "AEM"]
+    stocks: ["HL", "CDE", "EGO", "SSRM", "EQX", "AGI", "OGC", "NG", "DRD", "AEM"]
 
-  # ---- Rare Earths & Lithium ----
+  # ======================== RARE EARTHS & LITHIUM ========================
   - name: "Rare Earths"
     etf: "REMX"
     commodity_ticker: null
-    stocks: ["ALB", "600549", "PLS", "600111", "LYSCF", "LINRF", "MP", "NMREF", "TMRC", "REE"]
+    stocks: ["MP", "LYSCF", "TMRC", "REE", "NMREF", "ARRAF", "VREMF"]
 
   - name: "Lithium"
     etf: "LIT"
     commodity_ticker: null
-    stocks: ["RIO", "002371", "6752", "6762", "ALB", "TSLA", "006400", "GANFENG", "SQM", "LAC"]
+    stocks: ["ALB", "SQM", "LAC", "PLL", "SGML", "LTHM", "NVO", "ION"]
 
   - name: "Battery Materials"
     etf: "BATT"
     commodity_ticker: "HG=F"
-    stocks: ["BHP", "TSLA", "300750", "FCX", "BYDDF", "BE", "ALB", "SQM", "RIO", "LAC"]
+    stocks: ["ALB", "SQM", "LAC", "BHP", "RIO", "FCX", "NVO", "ION"]
 
-  # ---- Steel ----
+  # ======================== STEEL ========================
   - name: "Steel"
     etf: "SLX"
     commodity_ticker: "HRC=F"
-    stocks: ["BHP", "VALE", "RIO", "NUE", "STLD", "RS", "PKX", "TS", "MT", "X", "CLF", "CMC"]
+    stocks: ["NUE", "STLD", "X", "MT", "CLF", "CMC", "RS", "TX", "PKX", "TS"]
 
-  # ---- Agriculture ----
+  # ======================== AGRICULTURE ========================
   - name: "Agriculture/Fertilizer"
     etf: "MOO"
     commodity_ticker: "ZS=F"
-    stocks: ["BAYN", "DE", "CTVA", "ZTS", "NTR", "ADM", "BG", "CF", "MOS", "FMC"]
+    stocks: ["DE", "ADM", "CF", "MOS", "NTR", "BG", "CTVA", "FMC", "SHW", "DD"]
 
-  # ---- Real Estate & Construction ----
+  # ======================== REAL ESTATE & CONSTRUCTION ========================
   - name: "US REITs"
     etf: "VNQ"
     commodity_ticker: "LBR=F"
@@ -158,7 +158,7 @@ sectors:
     commodity_ticker: "LBR=F"
     stocks: ["WY", "SUZ", "SW", "WFG", "IP", "UPM", "NDNGF", "SCA", "MNDI", "WPC"]
 
-  # ---- Materials ----
+  # ======================== MATERIALS ========================
   - name: "Materials (S&P)"
     etf: "XLB"
     commodity_ticker: "HG=F"
@@ -169,7 +169,7 @@ sectors:
     commodity_ticker: "HG=F"
     stocks: ["LIN", "BHP", "AI", "NEM", "RIO", "SHW", "FCX", "GLEN", "VALE", "DOW"]
 
-  # ---- Utilities ----
+  # ======================== UTILITIES ========================
   - name: "Electric Utilities"
     etf: "XLU"
     commodity_ticker: "NG=F"
@@ -180,7 +180,6 @@ sectors:
     commodity_ticker: "HG=F"
     stocks: ["ETN", "JCI", "NGG", "ABBN", "SU", "NEE", "D", "SO", "ETR", "PPL"]
 
-  # ---- Clean Energy ----
   - name: "Clean Energy"
     etf: "ICLN"
     commodity_ticker: null
@@ -196,7 +195,7 @@ sectors:
     commodity_ticker: null
     stocks: ["ECL", "ROP", "FERG", "WAT", "IDXX", "AWK", "XYL", "VLTO", "CNI", "MSEX"]
 
-  # ---- Country ETFs as commodity plays ----
+  # ======================== COUNTRY ETFS ========================
   - name: "Canada (Commodity)"
     etf: "EWC"
     commodity_ticker: "CL=F"
@@ -221,6 +220,208 @@ sectors:
     etf: "EZA"
     commodity_ticker: "GC=F"
     stocks: ["AU", "NPN", "GFI", "FSR", "SBK", "ANG", "IMP", "SGL", "AGL", "DRD"]
+
+  # ======================== TECHNOLOGY ========================
+  - name: "Technology (S&P)"
+    etf: "XLK"
+    commodity_ticker: null
+    stocks: ["AAPL", "MSFT", "NVDA", "AVGO", "ADBE", "CRM", "AMD", "INTC", "IBM", "QCOM"]
+
+  - name: "Semiconductors (SMH)"
+    etf: "SMH"
+    commodity_ticker: null
+    stocks: ["TSM", "NVDA", "ASML", "AVGO", "AMD", "TXN", "QCOM", "MU", "ADI", "AMAT"]
+
+  - name: "Semiconductors (SOXX)"
+    etf: "SOXX"
+    commodity_ticker: null
+    stocks: ["TSM", "NVDA", "ASML", "AVGO", "AMD", "TXN", "QCOM", "MU", "ADI", "AMAT"]
+
+  - name: "Software (IGV)"
+    etf: "IGV"
+    commodity_ticker: null
+    stocks: ["MSFT", "CRM", "ORCL", "ADBE", "SAP", "INTU", "NOW", "SNPS", "CDNS", "PANW"]
+
+  - name: "Cybersecurity (CIBR)"
+    etf: "CIBR"
+    commodity_ticker: null
+    stocks: ["PANW", "CRWD", "FTNT", "ZS", "OKTA", "NET", "CHKP", "S", "CYBR", "TENB"]
+
+  - name: "Cloud Computing (SKYY)"
+    etf: "SKYY"
+    commodity_ticker: null
+    stocks: ["MSFT", "AMZN", "GOOGL", "ORCL", "IBM", "CRM", "ADBE", "INTU", "NOW", "SNOW"]
+
+  - name: "Robotics (BOTZ)"
+    etf: "BOTZ"
+    commodity_ticker: null
+    stocks: ["ABB", "FANUC", "Siemens", "Teradyne", "Rockwell", "Keyence", "Mitsubishi", "Yaskawa", "Omron", "NVIDIA"]
+
+  - name: "Internet (FDN)"
+    etf: "FDN"
+    commodity_ticker: null
+    stocks: ["AMZN", "GOOGL", "META", "NFLX", "UBER", "SNAP", "PINS", "DASH", "ABNB", "ZM"]
+
+  - name: "Fintech (FINX)"
+    etf: "FINX"
+    commodity_ticker: null
+    stocks: ["PYPL", "SQ", "FIS", "FISV", "GPN", "INTU", "STNE", "PAGS", "ADYEY", "SOFI"]
+
+  - name: "Genomics (ARKG)"
+    etf: "ARKG"
+    commodity_ticker: null
+    stocks: ["ILMN", "NVTA", "PACB", "BCRX", "EDIT", "NTLA", "BEAM", "CRSP", "TWST", "DNA"]
+
+  # ======================== FINANCIALS ========================
+  - name: "Financials (S&P)"
+    etf: "XLF"
+    commodity_ticker: null
+    stocks: ["JPM", "BAC", "WFC", "C", "GS", "MS", "SCHW", "AXP", "V", "MA"]
+
+  - name: "Regional Banks"
+    etf: "KRE"
+    commodity_ticker: null
+    stocks: ["USB", "PNC", "TFC", "KEY", "RF", "CFG", "HBAN", "ZION", "CMA", "WAL"]
+
+  - name: "Banks"
+    etf: "KBE"
+    commodity_ticker: null
+    stocks: ["JPM", "BAC", "WFC", "C", "USB", "PNC", "TFC", "KEY", "RF", "CFG"]
+
+  - name: "Insurance"
+    etf: "KIE"
+    commodity_ticker: null
+    stocks: ["BRK.B", "PGR", "AIG", "ALL", "TRV", "CB", "MET", "PRU", "LNC", "CINF"]
+
+  - name: "Brokers"
+    etf: "IAI"
+    commodity_ticker: null
+    stocks: ["SCHW", "GS", "MS", "IBKR", "JPM", "BAC", "WFC", "C", "AXP", "COIN"]
+
+  # ======================== HEALTHCARE ========================
+  - name: "Healthcare (S&P)"
+    etf: "XLV"
+    commodity_ticker: null
+    stocks: ["JNJ", "UNH", "MRK", "ABBV", "LLY", "PFE", "TMO", "DHR", "ABT", "BMY"]
+
+  - name: "Biotech (equal weight)"
+    etf: "XBI"
+    commodity_ticker: null
+    stocks: ["AMGN", "GILD", "BIIB", "REGN", "VRTX", "ILMN", "MRNA", "BMRN", "ALNY", "SRPT"]
+
+  - name: "Biotech (IBB)"
+    etf: "IBB"
+    commodity_ticker: null
+    stocks: ["AMGN", "GILD", "BIIB", "REGN", "VRTX", "ILMN", "MRNA", "BMRN", "ALNY", "SRPT"]
+
+  - name: "Medical Devices"
+    etf: "IHI"
+    commodity_ticker: null
+    stocks: ["TMO", "DHR", "ABT", "BDX", "MDT", "SYK", "BSX", "EW", "ISRG", "ZBH"]
+
+  - name: "Pharmaceuticals"
+    etf: "PJP"
+    commodity_ticker: null
+    stocks: ["JNJ", "MRK", "ABBV", "LLY", "PFE", "BMY", "AZN", "NVS", "GSK", "SNY"]
+
+  # ======================== INDUSTRIALS ========================
+  - name: "Industrials (S&P)"
+    etf: "XLI"
+    commodity_ticker: null
+    stocks: ["GE", "HON", "UNP", "CAT", "UPS", "BA", "RTX", "LMT", "WM", "DE"]
+
+  - name: "Infrastructure"
+    etf: "PAVE"
+    commodity_ticker: "HG=F"
+    stocks: ["CAT", "DE", "HON", "CEG", "ETN", "NEE", "PCAR", "VMC", "MLM", "SHW"]
+
+  - name: "Aerospace & Defense"
+    etf: "ITA"
+    commodity_ticker: null
+    stocks: ["BA", "RTX", "LMT", "NOC", "GD", "TDG", "HII", "TXT", "LHX", "HEI"]
+
+  - name: "Defense (PPA)"
+    etf: "PPA"
+    commodity_ticker: null
+    stocks: ["BA", "RTX", "LMT", "NOC", "GD", "TDG", "HII", "TXT", "LHX", "HEI"]
+
+  - name: "Transportation"
+    etf: "IYT"
+    commodity_ticker: null
+    stocks: ["UPS", "FDX", "UNP", "CSX", "NSC", "CNI", "KSU", "JBHT", "LUV", "DAL"]
+
+  - name: "Airlines"
+    etf: "JETS"
+    commodity_ticker: null
+    stocks: ["DAL", "UAL", "AAL", "LUV", "JBLU", "SAVE", "ALGT", "ALK", "SKYW", "MESA"]
+
+  - name: "Autos"
+    etf: "CARZ"
+    commodity_ticker: null
+    stocks: ["TSLA", "F", "GM", "STLA", "HMC", "TM", "VWAGY", "BMWYY", "DMLRY", "RACE"]
+
+  - name: "Electric Vehicles (DRIV)"
+    etf: "DRIV"
+    commodity_ticker: "HG=F"
+    stocks: ["TSLA", "F", "GM", "STLA", "HMC", "TM", "RIVN", "LCID", "NIO", "XPEV"]
+
+  - name: "Dry Bulk Shipping (BOAT)"
+    etf: "BOAT"
+    commodity_ticker: null
+    stocks: ["GOGL", "SBLK", "DSX", "EGLE", "SB", "NMM", "SHIP", "DRYS", "TNK", "DHT"]
+
+  # ======================== CONSUMER ========================
+  - name: "Consumer Discretionary (S&P)"
+    etf: "XLY"
+    commodity_ticker: null
+    stocks: ["AMZN", "HD", "MCD", "BKNG", "NKE", "SBUX", "LOW", "TGT", "TJX", "ROST"]
+
+  - name: "Consumer Staples (S&P)"
+    etf: "XLP"
+    commodity_ticker: null
+    stocks: ["PG", "KO", "PEP", "WMT", "COST", "PM", "MO", "CL", "MDLZ", "KHC"]
+
+  - name: "Retail"
+    etf: "XRT"
+    commodity_ticker: null
+    stocks: ["WMT", "HD", "LOW", "TJX", "TGT", "COST", "AMZN", "ROST", "DG", "DLTR"]
+
+  - name: "Travel"
+    etf: "AWAY"
+    commodity_ticker: null
+    stocks: ["BKNG", "EXPE", "TRIP", "TCOM", "MMYT", "MOND", "DESP", "TNL", "WH", "H"]
+
+  # ======================== COMMUNICATIONS ========================
+  - name: "Communication Services"
+    etf: "XLC"
+    commodity_ticker: null
+    stocks: ["GOOGL", "META", "NFLX", "DIS", "CMCSA", "T", "VZ", "ATVI", "EA", "TTWO"]
+
+  - name: "Telecom & Media"
+    etf: "VOX"
+    commodity_ticker: null
+    stocks: ["GOOGL", "META", "NFLX", "DIS", "CMCSA", "T", "VZ", "ATVI", "EA", "TTWO"]
+
+  # ======================== RATES (Bonds) ========================
+  - name: "20+ Year Treasuries"
+    etf: "TLT"
+    commodity_ticker: "GC=F"
+    stocks: ["TLT"]
+
+  - name: "Inflation-Protected Treasuries"
+    etf: "TIP"
+    commodity_ticker: "GC=F"
+    stocks: ["TIP"]
+
+  - name: "US Small-Cap (IWM)"
+    etf: "IWM"
+    commodity_ticker: null
+    stocks: ["IWM"]
+
+  - name: "Mortgage REITs"
+    etf: "REM"
+    commodity_ticker: null
+    stocks: ["NLY", "AGNC", "STWD", "BXMT", "LADR", "ARR", "CIM", "MFA", "NYMT", "TWO"]
 
 # ------------------------------------------------------------------ screening --
 screening:
