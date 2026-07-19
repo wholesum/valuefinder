@@ -13,19 +13,20 @@ def fetch_history(ticker: str, start_date: str = None, retries: int = 3, pause: 
     """
     for attempt in range(retries):
         try:
-            # Use auto_adjust=True to get adjusted closes – helps with timezone issues
-            data = yf.download(ticker, period="max", interval="1d", progress=False, auto_adjust=True)
+            # Use Ticker.history() which is more reliable than yf.download()
+            t = yf.Ticker(ticker)
+            data = t.history(period="max", interval="1d", auto_adjust=False)
             if data.empty:
                 raise ValueError("empty response")
 
-            # Use 'Close' column (auto_adjust=True gives 'Close' as adjusted)
+            # Use 'Close' column (or 'Adj Close' if available)
             close = data.get("Close")
             if close is None:
                 close = data.get("Adj Close")
             if close is None:
                 raise ValueError("no close column")
 
-            # Ensure it's a Series (not DataFrame)
+            # Ensure it's a Series
             if isinstance(close, pd.DataFrame):
                 close = close.iloc[:, 0]
 
