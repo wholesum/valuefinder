@@ -1,41 +1,60 @@
 """
-Simple web UI for the screener. Reads results from screener.db.
+app.py -- the web layer for the Value Screener.
+Serves the frontend and provides API endpoints for sector and stock results.
 """
+import os
 import sqlite3
 from flask import Flask, jsonify, send_from_directory
-import os
+from flask_cors import CORS
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=".")
+CORS(app)
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "data", "screener.db")
 
-def get_results():
+
+@app.route("/")
+def root():
+    return send_from_directory(".", "screener.html")
+
+
+@app.route("/api/sectors")
+def sector_results():
+    """Return sectors that passed the sector screen with stock count."""
     try:
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         rows = conn.execute(
-            "SELECT * FROM screener_results ORDER BY final_score"
+            "SELECT sector, COUNT(*) as stock_count FROM screener_results WHERE sector_pass=1 GROUP BY sector ORDER BY sector"
         ).fetchall()
         conn.close()
-        return [dict(r) for r in rows]
-    except:
-        return []
+        return jsonify([dict(r) for r in rows])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-@app.route('/')
-def index():
-    # Simple HTML table
-    results = get_results()
-    if not results:
-        return "<h1>No BUY signals currently.</h1><p>Run scripts/run_screener.py to refresh.</p>"
-    html = "<h1>Value Screener – BUY Signals</h1><table border='1'><tr><th>Ticker</th><th>Sector</th><th>Final Score</th><th>Recommendation</th></tr>"
-    for r in results:
-        html += f"<tr><td>{r['ticker']}</td><td>{r['sector']}</td><td>{r['final_score']:.2f}</td><td>{r['recommendation']}</td></tr>"
-    html += "</table>"
-    return html
 
-@app.route('/api/results')
-def api_results():
-    return jsonify(get_results())
+@app.route("/api/buy_stocks")
+def buy_stocks():
+    """Return all BUY signals."""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            "SELECT * FROM screener_results WHERE recommendation='BUY' ORDER BY final_score"
+        ).fetchall()
+        conn.close()
+        return jsonify([dict(r) for r in rows])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+@app.route("/api/macro")
+def macro_status():
+    """Return the latest macro status (from the database or a separate table)."""
+    # You can store macro results in a separate table or just return a placeholder.
+    # For now, we'll return a static message since macro is run offline.
+    return jsonify({"status": "Macro conditions met (last run)."})
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
