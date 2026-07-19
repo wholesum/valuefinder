@@ -12,7 +12,6 @@ import pandas as pd
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 
-# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -22,7 +21,6 @@ CORS(app)
 DB_PATH = os.path.join(os.path.dirname(__file__), "data", "screener.db")
 
 
-# Custom JSON encoder to handle numpy/pandas types
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, (np.integer, np.int64, np.int32)):
@@ -41,8 +39,6 @@ class CustomJSONEncoder(json.JSONEncoder):
             return None
         return super().default(obj)
 
-
-# Set custom encoder on the app
 app.json_encoder = CustomJSONEncoder
 
 
@@ -56,7 +52,6 @@ def sector_results():
     try:
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
-        # Get distinct sectors with BUY stocks
         rows = conn.execute(
             "SELECT DISTINCT sector FROM screener_results WHERE recommendation='BUY'"
         ).fetchall()
@@ -66,22 +61,20 @@ def sector_results():
             sector = r["sector"]
             conn2 = sqlite3.connect(DB_PATH)
             count = conn2.execute(
-                "SELECT COUNT(*) as cnt FROM screener_results WHERE sector=? AND recommendation='BUY'",
+                "SELECT COUNT(*) FROM screener_results WHERE sector=? AND recommendation='BUY'",
                 (sector,)
             ).fetchone()[0]
             conn2.close()
             sectors.append({"sector": sector, "stock_count": count})
         return jsonify(sectors)
     except Exception as e:
-        logger.error(f"Sectors API error: {traceback.format_exc()}")
+        logger.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/buy_stocks")
 def buy_stocks():
-    """
-    Return all BUY signals with basic info (no joins, no technical to avoid errors).
-    """
+    """Basic endpoint - returns only screener_results fields."""
     try:
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
@@ -89,17 +82,16 @@ def buy_stocks():
             "SELECT * FROM screener_results WHERE recommendation='BUY' ORDER BY final_score"
         ).fetchall()
         conn.close()
-        results = [dict(r) for r in rows]
-        return jsonify(results)
+        return jsonify([dict(r) for r in rows])
     except Exception as e:
-        logger.error(f"Stocks API error: {traceback.format_exc()}")
+        logger.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/buy_stocks_detailed")
 def buy_stocks_detailed():
     """
-    Return BUY signals with fundamentals and technicals (with safe fallbacks).
+    Detailed endpoint: joins with fundamentals and adds technical metrics.
     """
     try:
         conn = sqlite3.connect(DB_PATH)
@@ -111,7 +103,7 @@ def buy_stocks_detailed():
         results = []
         for r in rows:
             d = dict(r)
-            # Try to get fundamentals
+            # Fetch fundamentals
             try:
                 conn2 = sqlite3.connect(DB_PATH)
                 fund = conn2.execute(
@@ -129,31 +121,21 @@ def buy_stocks_detailed():
                     d["roe"] = fund[5]
                     d["free_cash_flow_yield"] = fund[6]
             except Exception as e:
-                logger.warning(f"Fundamentals fetch failed for {d['ticker']}: {e}")
-            
-            # Try technical
+                logger.warning(f"Fund fetch failed for {d['ticker']}: {e}")
+
+            # Fetch technicals
             try:
                 from lib import technical
-                tech_pass, tech_stats = technical.technical_pass(d["ticker"])
-                # Convert tech_stats to native Python types
+                _, tech_stats = technical.technical_pass(d["ticker"])
                 if tech_stats:
                     d["rsi"] = float(tech_stats.get("rsi")) if tech_stats.get("rsi") is not None else None
                     d["golden_cross"] = bool(tech_stats.get("golden_cross")) if tech_stats.get("golden_cross") is not None else None
                     d["sma_short"] = float(tech_stats.get("sma_short")) if tech_stats.get("sma_short") is not None else None
                     d["sma_long"] = float(tech_stats.get("sma_long")) if tech_stats.get("sma_long") is not None else None
-                else:
-                    d["rsi"] = None
-                    d["golden_cross"] = None
-                    d["sma_short"] = None
-                    d["sma_long"] = None
             except Exception as e:
-                logger.warning(f"Technical failed for {d['ticker']}: {e}")
-                d["rsi"] = None
-                d["golden_cross"] = None
-                d["sma_short"] = None
-                d["sma_long"] = None
-            
-            # Ensure all values are JSON-serializable (convert numpy/pandas types)
+                logger.warning(f"Tech failed for {d['ticker']}: {e}")
+
+            # Convert any numpy/pandas types
             for key, value in list(d.items()):
                 if isinstance(value, (np.integer, np.int64, np.int32)):
                     d[key] = int(value)
@@ -163,17 +145,17 @@ def buy_stocks_detailed():
                     d[key] = bool(value)
                 elif isinstance(value, (pd.Timestamp, np.datetime64)):
                     d[key] = str(value)
-                elif isinstance(value, np.ndarray):
+                elif isinstance(value, (float, int)):
+                    d[key] = value
+                elif value is None:
+                    continue
+                elif isinstance(value, (np.ndarray, pd.Series)):
                     d[key] = value.tolist()
-                elif isinstance(value, pd.Series):
-                    d[key] = value.tolist()
-                elif isinstance(value, float) and (np.isnan(value) or np.isinf(value)):
-                    d[key] = None
-            
+
             results.append(d)
         return jsonify(results)
     except Exception as e:
-        logger.error(f"Detailed stocks API error: {traceback.format_exc()}")
+        logger.error(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
 
 
@@ -188,14 +170,10 @@ def debug():
         if "screener_results" in table_list:
             cols = conn.execute("PRAGMA table_info(screener_results)").fetchall()
             result["screener_results_columns"] = [c["name"] for c in cols]
-            count = conn.execute("SELECT COUNT(*) as cnt FROM screener_results").fetchone()
+            count = conn.execute("SELECT COUNT(*) FROM screener_results").fetchone()
             result["screener_results_count"] = count[0] if count else 0
-            buy_count = conn.execute("SELECT COUNT(*) as cnt FROM screener_results WHERE recommendation='BUY'").fetchone()
+            buy_count = conn.execute("SELECT COUNT(*) FROM screener_results WHERE recommendation='BUY'").fetchone()
             result["buy_count"] = buy_count[0] if buy_count else 0
-            # Sample row
-            sample = conn.execute("SELECT * FROM screener_results LIMIT 1").fetchone()
-            if sample:
-                result["sample_row"] = dict(sample)
         conn.close()
         return jsonify(result)
     except Exception as e:
