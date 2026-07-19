@@ -78,8 +78,9 @@ def init_db():
     with get_conn() as conn:
         conn.executescript(SCHEMA)
         # Ensure all expected columns exist (migration for existing DB)
-        for col in ['value_pass']:
-            _add_column_if_not_exists(conn, "screener_results", col, "INTEGER")
+        # For screener_results
+        for col in ['sector_pass', 'value_pass', 'cost_pass', 'debt_pass', 'dilution_pass', 'technical_pass', 'recommendation']:
+            _add_column_if_not_exists(conn, "screener_results", col, "INTEGER" if col != 'recommendation' else "TEXT")
 
 # ---------------------------------------------------------------- prices ---
 def delete_prices_before(cutoff_date: str):
