@@ -1,5 +1,5 @@
 # ==============================================================================
-# Value Screener – Configuration (Complete Holdings)
+# Value Screener – Configuration (Final with lower bounds)
 # ==============================================================================
 
 macro:
@@ -379,4 +379,75 @@ sectors:
   - name: "Consumer Staples (S&P)"
     etf: "XLP"
     commodity_ticker: null
-    stocks: ["PG", "KO", "PEP"]
+    stocks: ["PG", "KO", "PEP", "WMT", "COST", "PM", "MO", "CL", "MDLZ", "KHC", "T", "VZ", "KO", "PEP", "PG", "CL", "KMB", "CHD", "CVS", "WBA", "KR", "SYY", "UNFI", "SPTN", "TAP", "STZ", "BFB", "BUD", "CCU", "COKE", "MNST", "KDP", "CAG", "CPB", "GIS", "HRL", "TSN", "SJM", "MKC", "FLO", "HORM", "JJSF", "LANC", "SEB", "POST", "TWNK", "BGS", "CALM", "FARM", "VITL", "BRFS"]
+
+  - name: "Retail"
+    etf: "XRT"
+    commodity_ticker: null
+    stocks: ["WMT", "HD", "LOW", "TJX", "TGT", "COST", "AMZN", "ROST", "DG", "DLTR", "M", "KSS", "JWN", "RH", "ETSY", "WAYF", "EBAY", "GPS", "VFC", "RL", "PVH", "LEVI", "KORS", "BBBY", "DDS", "NORD", "BRC", "ASO", "FIVE", "BBWI", "ANF", "URBN", "GES", "CHS", "SCVL", "ZUMZ", "CATO", "BURL", "TJX", "ROST"]
+
+  - name: "Travel"
+    etf: "AWAY"
+    commodity_ticker: null
+    stocks: ["BKNG", "EXPE", "TRIP", "TCOM", "MMYT", "DESP", "TNL", "WH", "H", "MAR", "HLT", "HST", "RCL", "NCLH", "CCL", "TUI", "TRVG", "ODT", "BLDE", "JNVR", "SKYW", "ALK", "LUV", "DAL", "UAL", "AAL", "JBLU", "SAVE", "ALGT"]
+
+  # ======================== COMMUNICATIONS ========================
+  - name: "Communication Services"
+    etf: "XLC"
+    commodity_ticker: null
+    stocks: ["GOOGL", "META", "NFLX", "DIS", "CMCSA", "T", "VZ", "ATVI", "EA", "TTWO", "WBD", "PARA", "FOXA", "NWSA", "NYT", "MTCH", "BIDU", "BABA", "JD", "NTES", "TME", "WB", "SNAP", "PINS", "TWTR", "SPOT", "AAPL", "MSFT", "AMZN", "GOOGL", "META", "NFLX", "DIS"]
+
+  - name: "Telecom & Media"
+    etf: "VOX"
+    commodity_ticker: null
+    stocks: ["GOOGL", "META", "NFLX", "DIS", "CMCSA", "T", "VZ", "ATVI", "EA", "TTWO", "WBD", "PARA", "FOXA", "NWSA", "NYT", "MTCH", "BIDU", "BABA", "JD", "NTES", "TME", "WB", "SNAP", "PINS", "TWTR", "SPOT", "AAPL", "MSFT", "AMZN", "GOOGL", "META", "NFLX", "DIS"]
+
+  # ======================== RATES (Bonds) ========================
+  - name: "20+ Year Treasuries"
+    etf: "TLT"
+    commodity_ticker: "GC=F"
+    stocks: ["TLT"]
+
+  - name: "Inflation-Protected Treasuries"
+    etf: "TIP"
+    commodity_ticker: "GC=F"
+    stocks: ["TIP"]
+
+  - name: "US Small-Cap (IWM)"
+    etf: "IWM"
+    commodity_ticker: null
+    stocks: ["IWM"]
+
+  - name: "Mortgage REITs"
+    etf: "REM"
+    commodity_ticker: null
+    stocks: ["NLY", "AGNC", "STWD", "BXMT", "LADR", "ARR", "CIM", "MFA", "NYMT", "TWO"]
+
+# ------------------------------------------------------------------ screening --
+screening:
+  min_years_history: 10
+  # Lower and upper bounds for valuation metrics
+  pb_min: 0.0
+  pb_max: 10.0
+  ev_ebitda_min: 0.0
+  ev_ebitda_max: 50.0
+  pe_max: 100.0
+  pfcf_max: 100.0
+  roe_min: -1.0
+  fcf_yield_min: -0.5
+  dilution_max: 0.25
+  # Debt
+  debt_equity_max: 200.0
+  # Technical
+  technical:
+    short_sma: 50
+    long_sma: 200
+    volume_multiplier: 1.5
+    rsi_oversold: 30
+    rsi_overbought: 70
+  # Sector screening
+  sector:
+    use_percentile: true
+    percentile_threshold: 30
+    pct_of_5y_high: 0.70
+    pct_of_10y_high: 0.80
