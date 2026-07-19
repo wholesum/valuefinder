@@ -40,7 +40,7 @@ def get_macro_data(commodity_ticker="GSG", stock_ticker="^GSPC", gold_ticker="GC
     return ratio1, ratio2, common
 
 
-def macro_status(lookback_years=25):
+def macro_status(lookback_years=25, cheap_threshold=25):
     """
     Evaluate the macro condition.
     Returns a dict with 'pass' (bool), 'bcom_sp_pct' (float),
@@ -52,8 +52,7 @@ def macro_status(lookback_years=25):
     # Compute current percentile (lower is cheaper)
     pct1 = r1.rank(pct=True).iloc[-1] * 100
     pct2 = r2.rank(pct=True).iloc[-1] * 100
-    # Both must be below the cheap_percentile threshold (default 20)
-    cheap_threshold = 25
+    # Both must be below the cheap_percentile threshold
     return {
         "pass": (pct1 <= cheap_threshold and pct2 <= cheap_threshold),
         "bcom_sp_pct": float(pct1),
