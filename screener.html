@@ -13,7 +13,7 @@
       --rich: #C97B4A; --rich-dim: #5C4636; --gold: #C9A24A; --radius: 3px;
     }
     body { margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; }
-    .wrap { max-width:1100px; margin:0 auto; padding:24px 20px 60px; }
+    .wrap { max-width:1200px; margin:0 auto; padding:24px 20px 60px; }
     .masthead { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:1px solid var(--hairline); padding-bottom:16px; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
     .masthead h1 { font-family:'Fraunces',serif; font-weight:500; font-size:28px; margin:0; }
     .masthead .kicker { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); }
@@ -22,22 +22,24 @@
     h2.section-title { font-family:'Fraunces',serif; font-weight:500; font-size:20px; display:flex; align-items:baseline; gap:8px; margin:0 0 4px; }
     h2.section-title .num { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-muted); font-weight:400; }
     p.section-note { font-size:12px; color:var(--ink-muted); margin:0 0 12px; }
-    table.stock-table { width:100%; border-collapse:collapse; font-size:12px; }
-    table.stock-table th { font-family:'IBM Plex Mono',monospace; font-size:9px; text-transform:uppercase; color:var(--ink-muted); text-align:left; padding:6px 8px; border-bottom:1px solid var(--hairline); cursor:pointer; user-select:none; }
-    table.stock-table td { padding:7px 8px; border-bottom:1px solid var(--hairline); font-family:'IBM Plex Mono',monospace; font-size:11.5px; }
+    table.stock-table { width:100%; border-collapse:collapse; font-size:11px; }
+    table.stock-table th { font-family:'IBM Plex Mono',monospace; font-size:8px; text-transform:uppercase; color:var(--ink-muted); text-align:left; padding:4px 6px; border-bottom:1px solid var(--hairline); cursor:pointer; user-select:none; }
+    table.stock-table td { padding:4px 6px; border-bottom:1px solid var(--hairline); font-family:'IBM Plex Mono',monospace; font-size:10.5px; }
     table.stock-table tbody tr:hover { background:var(--surface-2); cursor:pointer; }
-    .cheap-badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:600; }
+    .cheap-badge { display:inline-block; padding:1px 6px; border-radius:10px; font-size:9px; font-weight:600; }
     .cheap-badge.very-cheap { background:var(--cheap-dim); color:var(--cheap); }
     .cheap-badge.cheap { background:var(--cheap-dim); color:var(--cheap); opacity:0.75; }
     .cheap-badge.expensive { background:var(--rich-dim); color:var(--rich); }
     .cheap-badge.neutral { background:var(--hairline); color:var(--ink-muted); }
-    .rating-badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:9px; font-weight:600; }
+    .rating-badge { display:inline-block; padding:1px 6px; border-radius:10px; font-size:8px; font-weight:600; }
     .rating-badge.strong-buy, .rating-badge.buy { background:#1a4a1a; color:#6fcf97; }
     .rating-badge.hold { background:#4a4a1a; color:#f2c94a; }
     .rating-badge.sell, .rating-badge.strong-sell { background:#4a1a1a; color:#eb5757; }
     .rating-badge.na { background:var(--hairline); color:var(--ink-muted); }
     .disclaimer { margin-top:40px; padding-top:16px; border-top:1px solid var(--hairline); font-size:11px; color:var(--ink-muted); }
     .err { color:var(--rich); font-family:'IBM Plex Mono',monospace; font-size:12px; padding:12px; background:var(--surface); border-radius:var(--radius); margin-bottom:16px; }
+    .num-col { text-align:right; }
+    .badge-col { text-align:center; }
   </style>
 </head>
 <body>
@@ -48,6 +50,17 @@
 const { useState, useEffect } = React;
 const h = React.createElement;
 const API_BASE = '';
+
+function fmt(v, d=2) {
+  if (v === null || v === undefined) return '—';
+  if (typeof v === 'number' && !isFinite(v)) return '—';
+  return Number(v).toFixed(d);
+}
+
+function pct(v) {
+  if (v === null || v === undefined) return '—';
+  return fmt(v*100, 1) + '%';
+}
 
 function Table({ title, note, rows, columns }) {
   if (!rows || rows.length === 0) {
@@ -84,10 +97,8 @@ function App() {
         ]);
         if (!secRes.ok) throw new Error('Sectors API error');
         if (!stockRes.ok) throw new Error('Stocks API error');
-        const secData = await secRes.json();
-        const stockData = await stockRes.json();
-        setSectors(secData);
-        setStocks(stockData);
+        setSectors(await secRes.json());
+        setStocks(await stockRes.json());
       } catch (err) {
         setError(err.message);
       }
@@ -98,16 +109,27 @@ function App() {
 
   if (loading) return h('div', {className:'wrap'}, h('p', {className:'meta'}, 'Loading…'));
 
+  // Sector columns – we'll display these when we have data
   const sectorCols = [
     { key:'sector', header:'Sector' },
-    { key:'stock_count', header:'Stocks Passing' }
+    { key:'stock_count', header:'Stocks Passing' },
+    // Add more columns once we have the data
   ];
 
+  // Stock columns with detailed metrics
   const stockCols = [
     { key:'ticker', header:'Ticker' },
     { key:'sector', header:'Sector' },
-    { key:'final_score', header:'Score', render: r => r.final_score ? r.final_score.toFixed(2) : '—' },
-    { key:'recommendation', header:'Rec' }
+    { key:'final_score', header:'Score', render: r => r.final_score ? fmt(r.final_score) : '—' },
+    { key:'recommendation', header:'Rec' },
+    { key:'gross_margin', header:'Gross Margin', render: r => r.gross_margin ? pct(r.gross_margin) : '—' },
+    { key:'debt_ebitda', header:'D/E', render: r => r.debt_ebitda ? fmt(r.debt_ebitda) : '—' },
+    { key:'dilution', header:'Dilution', render: r => r.dilution_value ? pct(r.dilution_value) : '—' }, // assumed stored
+    { key:'price_book', header:'P/B', render: r => r.price_book ? fmt(r.price_book) : '—' },
+    { key:'ev_ebitda', header:'EV/EBITDA', render: r => r.ev_ebitda ? fmt(r.ev_ebitda) : '—' },
+    { key:'trailing_pe', header:'P/E', render: r => r.trailing_pe ? fmt(r.trailing_pe) : '—' },
+    { key:'rsi', header:'RSI', render: r => r.rsi ? fmt(r.rsi) : '—' },
+    { key:'golden_cross', header:'Golden Cross', render: r => r.golden_cross ? '✅' : '❌' },
   ];
 
   return h('div', {className:'wrap'}, [
