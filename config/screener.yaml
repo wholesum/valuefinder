@@ -52,7 +52,7 @@ sectors:
   - name: "Uranium (Global X)"
     etf: "URA"
     commodity_ticker: "URA"
-    stocks: ["CCJ", "UUUU", "NXE", "DNN", "UEC", "ISO", "LAM"]
+    stocks: ["CCJ", "UUUU", "NXE", "DNN", "UEC", "LAM"]
 
   - name: "Uranium Miners (Sprott)"
     etf: "URNM"
