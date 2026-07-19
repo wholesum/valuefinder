@@ -1,5 +1,5 @@
 """
-Stock-level filters with safe conversion and relaxed thresholds.
+Stock-level filters with safe conversion and lower/upper bounds for valuation.
 """
 from . import db
 
@@ -43,13 +43,14 @@ def dilution_filter(ticker, max_yoy=0.25):
     newest = shares_hist[0][1]
     if oldest <= 0:
         return True, None
-    annual_growth = (newest / oldest) ** (1 / (len(shares_hist)/252)) - 1
+    annual_growth = (newest / oldest) ** (1 / (len(shares_hist)/4)) - 1  # quarterly data -> 4 quarters per year
     if abs(annual_growth) > 10.0:  # skip extreme errors
         return True, None
     return annual_growth <= max_yoy, annual_growth
 
-def value_filter(ticker, pb_max=10.0, ev_ebitda_max=50.0, pe_max=100.0,
-                 pfcf_max=100.0, roe_min=-1.0, fcf_yield_min=-0.5):
+def value_filter(ticker, pb_min=0.0, pb_max=10.0, ev_ebitda_min=0.0,
+                 ev_ebitda_max=50.0, pe_max=100.0, pfcf_max=100.0,
+                 roe_min=-1.0, fcf_yield_min=-0.5):
     fund = get_fund(ticker)
     if not fund:
         return True, {}
@@ -60,8 +61,8 @@ def value_filter(ticker, pb_max=10.0, ev_ebitda_max=50.0, pe_max=100.0,
     roe = safe_float(fund.get("roe"))
     fcf_yield = safe_float(fund.get("free_cash_flow_yield"))
 
-    pass_pb = pb is None or pb <= pb_max
-    pass_ev = ev is None or ev <= ev_ebitda_max
+    pass_pb = pb is None or (pb_min <= pb <= pb_max)
+    pass_ev = ev is None or (ev_ebitda_min <= ev <= ev_ebitda_max)
     pass_pe = pe is None or pe <= pe_max
     pass_pfcf = pfcf is None or pfcf <= pfcf_max
     pass_roe = roe is None or roe >= roe_min
@@ -86,6 +87,7 @@ def screen_stock(ticker, sector, commodity_spot_price):
     score = 0
     count = 0
     if value_metrics.get("pb") is not None:
+        # Normalize PB to 0-10 range
         score += value_metrics["pb"] / 10.0
         count += 1
     if value_metrics.get("ev") is not None:
@@ -113,10 +115,10 @@ def screen_stock(ticker, sector, commodity_spot_price):
         "cost_pass": cost_pass,
         "debt_pass": debt_pass,
         "dilution_pass": dil_pass,
+        "dilution_value": dil_val,
         "value_pass": value_pass,
         "cost_value": cost_val,
         "debt_value": debt_val,
-        "dilution_value": dil_val,
         "value_metrics": value_metrics,
         "value_score": value_score,
         "fundamental_pass": fundamental_pass
