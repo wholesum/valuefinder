@@ -12,7 +12,6 @@ def fetch_price_history(ticker, start_date=None, end_date=None, force_refresh=Fa
         cached = db.get_prices(ticker, start_date, end_date)
         if cached:
             return cached
-    # fetch from yfinance with auto_adjust=True
     try:
         data = yf.download(ticker, start=start_date, end=end_date, progress=False, auto_adjust=True)
     except Exception as e:
@@ -21,12 +20,16 @@ def fetch_price_history(ticker, start_date=None, end_date=None, force_refresh=Fa
     if data.empty:
         print(f"  WARNING: No data returned for {ticker}")
         return []
+    # Extract Close column; if DataFrame, take first column
+    close = data["Close"]
+    if isinstance(close, pd.DataFrame):
+        close = close.iloc[:, 0]
+    close_values = close.tolist()
     # Convert index to date strings
     if isinstance(data.index, pd.DatetimeIndex):
         date_strs = data.index.strftime("%Y-%m-%d").tolist()
     else:
         date_strs = data.index.astype(str).tolist()
-    close_values = data["Close"].tolist()
     rows = list(zip(date_strs, close_values))
     db.upsert_prices(ticker, rows, "yfinance")
     return rows
