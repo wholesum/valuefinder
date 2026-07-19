@@ -155,6 +155,7 @@ def run(force_macro=False):
                 "cost_pass": stock_result["cost_pass"],
                 "debt_pass": stock_result["debt_pass"],
                 "dilution_pass": stock_result["dilution_pass"],
+                "dilution_value": stock_result["dilution_value"],  # <-- add this
                 "value_pass": stock_result["value_pass"],
                 "technical_pass": True,
                 "final_score": stock_result["value_score"] or 0,
