@@ -2,6 +2,10 @@
 """
 Main screener script. Runs macro, sector, and stock screens, then saves results.
 """
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import yaml
 from datetime import datetime, timezone
 from lib import db, macro, sector, stock, technical, data_fetcher
