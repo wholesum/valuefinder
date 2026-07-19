@@ -53,7 +53,7 @@ def macro_status(lookback_years=25):
     pct1 = r1.rank(pct=True).iloc[-1] * 100
     pct2 = r2.rank(pct=True).iloc[-1] * 100
     # Both must be below the cheap_percentile threshold (default 20)
-    cheap_threshold = 20
+    cheap_threshold = 25
     return {
         "pass": (pct1 <= cheap_threshold and pct2 <= cheap_threshold),
         "bcom_sp_pct": float(pct1),
