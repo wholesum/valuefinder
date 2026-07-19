@@ -54,7 +54,6 @@ def run(force_macro=False):
     results = []
     for sector_cfg in qualifying_sectors:
         sector_name = sector_cfg["name"]
-        # get commodity spot price if available
         commodity_ticker = sector_cfg.get("commodity_ticker")
         if commodity_ticker:
             rows = data_fetcher.fetch_price_history(commodity_ticker)
@@ -66,26 +65,21 @@ def run(force_macro=False):
             current_spot = 1.0
 
         for ticker in sector_cfg["stocks"]:
-            # fetch fundamentals (will cache)
             fund = data_fetcher.fetch_fundamentals(ticker)
             if fund:
                 db.upsert_fundamentals(ticker, fund)
-            # fetch shares history
             shares = data_fetcher.fetch_shares_history(ticker)
 
-            # screen stock
             stock_result = stock.screen_stock(ticker, sector_name, current_spot)
             if not stock_result["fundamental_pass"]:
                 print(f"STOCK FAIL (fundamental): {ticker} ({sector_name})")
                 continue
 
-            # technical check
             tech_pass, tech_stats = technical.technical_pass(ticker)
             if not tech_pass:
                 print(f"STOCK FAIL (technical): {ticker} ({sector_name})")
                 continue
 
-            # If both fundamental and technical pass, it's a buy signal
             print(f"STOCK BUY: {ticker} ({sector_name}) – all screens passed.")
             results.append({
                 "ticker": ticker,
@@ -100,7 +94,6 @@ def run(force_macro=False):
                 "recommendation": "BUY",
                 "last_updated": datetime.now(timezone.utc).isoformat()
             })
-            # Save to DB
             db.save_result(results[-1])
 
     print(f"Screener completed. {len(results)} stocks flagged as BUY.")
