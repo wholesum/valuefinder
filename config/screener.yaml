@@ -1,8 +1,8 @@
 macro:
-  commodity_index: "GSG"                # proxy for BCOM (iShares S&P GSCI)
+  commodity_index: "^BCOM"   # was "GSG"
   stock_index: "^GSPC"
   gold: "GC=F"
-  lookback_years: 25                     # increased to 25 years
+  lookback_years: 25
   cheap_percentile: 20
 
 sectors:
