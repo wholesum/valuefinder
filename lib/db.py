@@ -61,8 +61,13 @@ def get_conn():
         conn.close()
 
 def init_db():
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     with get_conn() as conn:
         conn.executescript(SCHEMA)
+        # Add new columns if they don't exist
+        for col in ['trailing_pe', 'price_to_free_cash_flow', 'roe', 'free_cash_flow_yield',
+                    'current_ratio', 'interest_coverage']:
+            _add_column_if_not_exists(conn, "fundamentals", col, "REAL")
 
 def upsert_prices(ticker, rows, source):
     with get_conn() as conn:
@@ -89,10 +94,23 @@ def upsert_fundamentals(ticker, data):
     with get_conn() as conn:
         conn.execute(
             """INSERT OR REPLACE INTO fundamentals
-               (ticker, shares_outstanding, debt_ebitda, price_book, ev_ebitda, gross_margin, last_updated)
-               VALUES (?,?,?,?,?,?,?)""",
-            (ticker, data.get("shares"), data.get("debt_ebitda"), data.get("pb"),
-             data.get("ev_ebitda"), data.get("gross_margin"), data.get("last_updated"))
+               (ticker, shares_outstanding, debt_ebitda, price_book, ev_ebitda,
+                gross_margin, trailing_pe, price_to_free_cash_flow, roe,
+                free_cash_flow_yield, current_ratio, interest_coverage, last_updated)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            (ticker,
+             data.get("shares"),
+             data.get("debt_ebitda"),
+             data.get("pb"),
+             data.get("ev_ebitda"),
+             data.get("gross_margin"),
+             data.get("trailing_pe"),
+             data.get("price_to_free_cash_flow"),
+             data.get("roe"),
+             data.get("free_cash_flow_yield"),
+             data.get("current_ratio"),
+             data.get("interest_coverage"),
+             data.get("last_updated"))
         )
 
 def get_fundamentals(ticker):
