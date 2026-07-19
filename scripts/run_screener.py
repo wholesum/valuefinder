@@ -19,8 +19,11 @@ def run(force_macro=False):
     db.init_db()
     cfg = load_config()
 
-    # Debug: print the top-level keys to see what's loaded
+    # Debug: print the top-level keys
     print("Config keys:", list(cfg.keys()))
+
+    # Debug: print the raw sectors value
+    print("Raw sectors value:", cfg.get("sectors"))
 
     # Macro params
     macro_cfg = cfg.get("macro", {})
@@ -47,18 +50,26 @@ def run(force_macro=False):
     # 2. Sector screening
     sectors_cfg = cfg.get("sectors")
     if sectors_cfg is None:
-        print("ERROR: 'sectors' key not found in config. Please check config/screener.yaml")
-        print("Config keys:", list(cfg.keys()))
+        print("ERROR: 'sectors' key exists but value is None. Check your YAML formatting.")
+        print("Make sure 'sectors:' is followed by a list of items, e.g.:")
+        print("  sectors:")
+        print("    - name: 'Oil & Gas'")
+        print("      etf: 'XLE'")
+        print("      ...")
         return
 
     # If sectors_cfg is a dict (old format), convert to list
     if isinstance(sectors_cfg, dict):
-        # assume it's a dict with sector names as keys, values as configs
+        print("Converting sectors from dict to list...")
         sectors_cfg = [{"name": k, **v} for k, v in sectors_cfg.items()]
 
     # Ensure we have a list
     if not isinstance(sectors_cfg, list):
-        print("ERROR: 'sectors' should be a list. Got:", type(sectors_cfg))
+        print(f"ERROR: 'sectors' should be a list. Got: {type(sectors_cfg)}")
+        return
+
+    if not sectors_cfg:
+        print("WARNING: 'sectors' is an empty list. No sectors to scan.")
         return
 
     sector_params = cfg.get("screening", {}).get("sector", {})
