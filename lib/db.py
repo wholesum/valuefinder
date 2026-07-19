@@ -1,5 +1,5 @@
 """
-SQLite persistence layer.
+SQLite persistence layer with column migration support.
 """
 import os
 import sqlite3
@@ -77,10 +77,9 @@ def _add_column_if_not_exists(conn, table, column, coltype):
 def init_db():
     with get_conn() as conn:
         conn.executescript(SCHEMA)
-        # Add any missing columns to fundamentals (in case they were added later)
-        for col in ['trailing_pe', 'price_to_free_cash_flow', 'roe', 'free_cash_flow_yield',
-                    'current_ratio', 'interest_coverage']:
-            _add_column_if_not_exists(conn, "fundamentals", col, "REAL")
+        # Ensure all expected columns exist (migration for existing DB)
+        for col in ['value_pass']:
+            _add_column_if_not_exists(conn, "screener_results", col, "INTEGER")
 
 # ---------------------------------------------------------------- prices ---
 def delete_prices_before(cutoff_date: str):
