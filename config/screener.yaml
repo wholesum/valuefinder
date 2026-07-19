@@ -3,7 +3,7 @@ macro:
   stock_index: "^GSPC"
   gold: "GC=F"
   lookback_years: 25
-  cheap_percentile: 20
+  cheap_percentile: 25
 
 sectors:
   # ---- Energy ----
