@@ -93,7 +93,7 @@ function App() {
       try {
         const [secRes, stockRes] = await Promise.all([
           fetch(API_BASE + '/api/sectors'),
-          fetch(API_BASE + '/api/buy_stocks')
+          fetch(API_BASE + '/api/buy_stocks_detailed')  // <-- changed
         ]);
         if (!secRes.ok) throw new Error('Sectors API error');
         if (!stockRes.ok) throw new Error('Stocks API error');
