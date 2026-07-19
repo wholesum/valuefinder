@@ -41,23 +41,22 @@ def fetch_price_history(ticker, start_date=None, end_date=None, force_refresh=Fa
     return rows
 
 def fetch_fundamentals(ticker):
-    """Get key fundamental metrics from yfinance Ticker.info()"""
     try:
-        import yfinance as yf
         t = yf.Ticker(ticker)
         info = t.info
         if not info:
             return None
         return {
             "shares": info.get("sharesOutstanding"),
-            "debt_ebitda": info.get("debtToEquity"),
+            "debt_ebitda": info.get("debtToEquity"),  # actually debt-to-equity
             "pb": info.get("priceToBook"),
             "ev_ebitda": info.get("enterpriseToEbitda"),
             "gross_margin": info.get("grossMargins"),
             "last_updated": datetime.utcnow().isoformat()
         }
-    except Exception:
+    except:
         return None
+    
 
 def fetch_shares_history(ticker, years=5):
     """Pull historical shares outstanding from quarterly/annual filings."""
