@@ -17,17 +17,22 @@ def fetch(symbol: str, start_date: str = None, retries: int = 2, pause: float = 
         params["d2"] = ""  # empty = up to today
     for attempt in range(retries + 1):
         try:
-            resp = requests.get(STOOQ_URL, params=params, timeout=15)
+            resp = requests.get(STOOQ_URL, params=params, timeout=30)
             resp.raise_for_status()
             text = resp.text
             if "Exceeded" in text or len(text) < 40:
+                print(f"  Stooq: response too short or exceeded for {symbol}")
                 return None
             df = pd.read_csv(io.StringIO(text))
             if df.empty or "Close" not in df.columns or "Date" not in df.columns:
+                print(f"  Stooq: invalid CSV for {symbol}")
                 return None
             df = df[["Date", "Close"]].dropna()
+            if df.empty:
+                return []
             return list(df.itertuples(index=False, name=None))
-        except Exception:
+        except Exception as e:
+            print(f"  Stooq attempt {attempt+1} failed for {symbol}: {e}")
             if attempt < retries:
                 time.sleep(pause)
                 continue
