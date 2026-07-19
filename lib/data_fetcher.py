@@ -1,42 +1,49 @@
 """
-Centralised data fetcher. Uses yfinance and caches in SQLite.
+Centralised data fetcher using Stooq (primary) and yfinance (fallback).
+Also caches results in SQLite.
 """
-import yfinance as yf
-from datetime import datetime, timedelta
-import pandas as pd
+from datetime import datetime
 from . import db
+from . import stooq_fetcher, yfinance_fetcher
 
 def fetch_price_history(ticker, start_date=None, end_date=None, force_refresh=False):
-    """Return list of (date, close). Uses cache unless force_refresh."""
+    """
+    Fetch price history for a ticker. Uses Stooq for equities/ETFs (with '.us' suffix),
+    falls back to yfinance. Caches in SQLite unless force_refresh=True.
+    """
+    # If we have cached data and not forcing refresh, return it
     if not force_refresh:
         cached = db.get_prices(ticker, start_date, end_date)
         if cached:
             return cached
-    try:
-        data = yf.download(ticker, start=start_date, end=end_date, progress=False, auto_adjust=True)
-    except Exception as e:
-        print(f"  ERROR fetching {ticker}: {e}")
-        return []
-    if data.empty:
-        print(f"  WARNING: No data returned for {ticker}")
-        return []
-    # Extract Close column; if DataFrame, take first column
-    close = data["Close"]
-    if isinstance(close, pd.DataFrame):
-        close = close.iloc[:, 0]
-    close_values = close.tolist()
-    # Convert index to date strings
-    if isinstance(data.index, pd.DatetimeIndex):
-        date_strs = data.index.strftime("%Y-%m-%d").tolist()
+
+    # Determine source: try Stooq first for equities (ticker like 'XLE', 'OIH')
+    # We'll use 'equity' kind for all our ETFs, but if it fails we fall back to yfinance
+    rows = None
+    used_source = None
+
+    # Try Stooq (works for US stocks/ETFs)
+    symbol = stooq_fetcher.to_stooq_symbol(ticker, "equity")
+    rows = stooq_fetcher.fetch(symbol, start_date=start_date)
+    if rows is not None:
+        used_source = "stooq"
     else:
-        date_strs = data.index.astype(str).tolist()
-    rows = list(zip(date_strs, close_values))
-    db.upsert_prices(ticker, rows, "yfinance")
+        # Fallback to yfinance
+        rows = yfinance_fetcher.fetch_history(ticker, start_date=start_date)
+        if rows is not None:
+            used_source = "yfinance"
+
+    if rows is None:
+        return []
+
+    # Cache the data
+    db.upsert_prices(ticker, rows, used_source)
     return rows
 
 def fetch_fundamentals(ticker):
     """Get key fundamental metrics from yfinance Ticker.info()"""
     try:
+        import yfinance as yf
         t = yf.Ticker(ticker)
         info = t.info
         if not info:
@@ -49,13 +56,13 @@ def fetch_fundamentals(ticker):
             "gross_margin": info.get("grossMargins"),
             "last_updated": datetime.utcnow().isoformat()
         }
-    except Exception as e:
-        print(f"  WARNING: Failed to fetch fundamentals for {ticker}: {e}")
+    except Exception:
         return None
 
 def fetch_shares_history(ticker, years=5):
     """Pull historical shares outstanding from quarterly/annual filings."""
     try:
+        import yfinance as yf
         t = yf.Ticker(ticker)
         bs = t.quarterly_balance_sheet
         if bs is not None and "Ordinary Shares Number" in bs.index:
@@ -68,6 +75,5 @@ def fetch_shares_history(ticker, years=5):
             db.upsert_shares_history(ticker, rows)
             return rows
         return []
-    except Exception as e:
-        print(f"  WARNING: Failed to fetch shares history for {ticker}: {e}")
+    except Exception:
         return []
