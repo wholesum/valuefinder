@@ -1,5 +1,6 @@
 """
-Sector screening: compare current price to 5y and 10y highs. Includes debug output.
+Sector screening: compare current price to 5y and 10y highs.
+Uses Stooq for primary data, with fallback to yfinance.
 """
 import pandas as pd
 from . import data_fetcher
@@ -9,8 +10,10 @@ def sector_screen(etf_ticker, min_years=5, debug=True):
     Return True if current price is below 70% of the 5-year high and below 80%
     of the 10-year high (i.e., "hated").
     """
-    # Force a fresh fetch to avoid stale/empty cache
-    rows = data_fetcher.fetch_price_history(etf_ticker, force_refresh=True)
+    # Fetch as much data as possible (start from 2000 to get 20+ years)
+    start_date = "2000-01-01"
+    rows = data_fetcher.fetch_price_history(etf_ticker, start_date=start_date, force_refresh=True)
+
     if len(rows) < 252:  # at least 1 year of daily data
         if debug:
             print(f"  DEBUG: {etf_ticker} – insufficient data: {len(rows)} rows")
@@ -34,12 +37,10 @@ def sector_screen(etf_ticker, min_years=5, debug=True):
     if len(s_10y) < 252:
         if debug:
             print(f"  DEBUG: {etf_ticker} – insufficient data in 10y window: {len(s_10y)} rows")
-        # still try to use what we have
         high_10y = s_10y.max() if not s_10y.empty else None
     else:
         high_10y = s_10y.max()
 
-    # thresholds: current < 70% of 5y high, and < 80% of 10y high
     pass_5y = (current / high_5y) < 0.70 if not pd.isna(high_5y) else False
     pass_10y = (current / high_10y) < 0.80 if (high_10y is not None and not pd.isna(high_10y)) else False
 
