@@ -2,30 +2,102 @@ macro:
   commodity_index: "GSG"                # proxy for BCOM (iShares S&P GSCI)
   stock_index: "^GSPC"
   gold: "GC=F"
-  lookback_years: 20
-  cheap_percentile: 20                  # bottom 20% is cheap
+  lookback_years: 25                     # increased to 25 years
+  cheap_percentile: 20
 
 sectors:
-  # Each sector has an ETF ticker and a list of representative stocks
-  - name: "Uranium"
-    etf: "URA"
-    stocks: ["CCJ", "UUUU", "NXE", "DNN"]
-    cost_metric: "aisc"                 # not directly available; we use gross margin proxy
+  # ---- Energy ----
   - name: "Oil & Gas"
     etf: "XLE"
-    stocks: ["XOM", "CVX", "COP", "EOG"]
-  - name: "Coal"
-    etf: "KOL"
-    stocks: ["BTU", "ARCH", "AMR"]
-  # add more as needed
+    commodity_ticker: "CL=F"             # WTI Crude Oil
+    stocks: ["XOM", "CVX", "COP", "EOG", "OXY", "SLB", "HAL", "BP", "SHEL"]
+  - name: "Oil Services"
+    etf: "OIH"
+    commodity_ticker: "CL=F"
+    stocks: ["SLB", "HAL", "BHGE", "NOV", "WFT", "CHX"]
+  - name: "Natural Gas Producers"
+    etf: "FCG"
+    commodity_ticker: "NG=F"
+    stocks: ["EQT", "RRC", "AR", "SWN", "COG", "CNX"]
+  - name: "Refiners"
+    etf: "CRAK"
+    commodity_ticker: "CL=F"
+    stocks: ["VLO", "PSX", "MPC", "DINO", "WKC"]
+  - name: "Uranium"
+    etf: "URA"
+    commodity_ticker: "URA"               # no direct uranium spot; use ETF as proxy
+    stocks: ["CCJ", "UUUU", "NXE", "DNN", "UEC", "ISO", "LAM"]
+  - name: "Uranium Miners"
+    etf: "URNM"
+    commodity_ticker: "URA"
+    stocks: ["CCJ", "UUUU", "NXE", "DNN", "UEC"]
+
+  # ---- Metals & Mining ----
+  - name: "Metals & Mining"
+    etf: "XME"
+    commodity_ticker: "HG=F"              # Copper (COMEX)
+    stocks: ["FCX", "BHP", "RIO", "GLEN", "VALE", "TECK", "NEXA"]
+  - name: "Copper Miners"
+    etf: "COPX"
+    commodity_ticker: "HG=F"
+    stocks: ["FCX", "BHP", "RIO", "GLEN", "VALE", "TECK", "LUN", "SCCO"]
+  - name: "Gold Miners"
+    etf: "GDX"
+    commodity_ticker: "GC=F"
+    stocks: ["NEM", "GOLD", "ABX", "AEM", "KGC", "IAG", "YRI"]
+  - name: "Silver Miners"
+    etf: "SIL"
+    commodity_ticker: "SI=F"
+    stocks: ["SIL", "AG", "PAAS", "FSM", "GPL", "HL", "CDE"]
+
+  # ---- Agriculture ----
+  - name: "Agriculture/Fertilizer"
+    etf: "MOO"
+    commodity_ticker: "ZS=F"             # Soybeans proxy
+    stocks: ["DE", "ADM", "CF", "MOS", "NTR", "BG", "CTVA"]
+
+  # ---- Real Estate / REITs ----
+  - name: "US REITs"
+    etf: "VNQ"
+    commodity_ticker: "LBR=F"            # Lumber proxy
+    stocks: ["PLD", "PSA", "SPG", "WELL", "AVB", "EQR", "VTR", "ESS"]
+
+  - name: "Homebuilders"
+    etf: "ITB"
+    commodity_ticker: "LBR=F"
+    stocks: ["DHI", "LEN", "NVR", "PHM", "TOL", "MTH"]
+
+  # ---- Technology / Semiconductors (added for diversity) ----
+  - name: "Semiconductors"
+    etf: "SOXX"
+    commodity_ticker: null
+    stocks: ["TSM", "NVDA", "AMD", "INTC", "QCOM", "TXN", "MU", "ADI"]
+
+  # ---- Healthcare ----
+  - name: "Biotech"
+    etf: "XBI"
+    commodity_ticker: null
+    stocks: ["AMGN", "GILD", "BIIB", "REGN", "VRTX", "ILMN", "MRNA"]
+
+  # ---- Utilities ----
+  - name: "Electric Utilities"
+    etf: "XLU"
+    commodity_ticker: "NG=F"
+    stocks: ["NEE", "DUK", "SO", "D", "AEP", "EXC", "SRE"]
+
+  # ---- Consumer Staples ----
+  - name: "Consumer Staples"
+    etf: "XLP"
+    commodity_ticker: null
+    stocks: ["PG", "KO", "PEP", "WMT", "COST", "PM", "MO"]
 
 screening:
   min_years_history: 10
   debt_ebitda_max: 2.5
-  pb_max: 3.0                           # price-to-book cap
+  pb_max: 3.0
   ev_ebitda_max: 15.0
-  dilution_max: 0.05                    # 5% annual share growth
+  dilution_max: 0.05
   technical:
     short_sma: 50
     long_sma: 200
-    volume_multiplier: 1.5              # above average volume
+    volume_multiplier: 1.5
