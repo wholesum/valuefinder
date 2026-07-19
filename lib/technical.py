@@ -2,6 +2,7 @@
 Technical filters: SMA cross, volume confirmation, RSI, breakout detection.
 """
 import pandas as pd
+import numpy as np
 from . import data_fetcher
 
 def technical_pass(ticker, short=50, long=200, volume_mult=1.5,
@@ -16,9 +17,9 @@ def technical_pass(ticker, short=50, long=200, volume_mult=1.5,
     sma_short = s.rolling(short).mean().iloc[-1]
     sma_long = s.rolling(long).mean().iloc[-1]
 
-    golden_cross = sma_short > sma_long
-    price_above_short = current > sma_short
-    price_above_long = current > sma_long
+    golden_cross = bool(sma_short > sma_long)   # convert to Python bool
+    price_above_short = bool(current > sma_short)
+    price_above_long = bool(current > sma_long)
 
     delta = s.diff()
     gain = delta.clip(lower=0).rolling(14).mean()
@@ -26,12 +27,13 @@ def technical_pass(ticker, short=50, long=200, volume_mult=1.5,
     rs = gain / loss
     rsi = 100 - (100 / (1 + rs))
     rsi_val = rsi.iloc[-1] if not pd.isna(rsi.iloc[-1]) else 50
+    rsi_val = float(rsi_val)   # convert to Python float
 
     tech_pass = price_above_short and price_above_long and golden_cross and (rsi_val < rsi_overbought)
 
-    return tech_pass, {
-        "sma_short": sma_short,
-        "sma_long": sma_long,
+    return bool(tech_pass), {
+        "sma_short": float(sma_short),
+        "sma_long": float(sma_long),
         "golden_cross": golden_cross,
         "price_above_short": price_above_short,
         "price_above_long": price_above_long,
