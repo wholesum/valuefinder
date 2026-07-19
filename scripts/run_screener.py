@@ -20,7 +20,7 @@ def run(force_macro=False):
     cfg = load_config()
     macro_lookback = cfg["macro"].get("lookback_years", 25)
     macro_threshold = cfg["macro"].get("cheap_percentile", 20)
-    
+
     # 1. Macro check
     macro_status = macro.macro_status(lookback_years=macro_lookback, cheap_threshold=macro_threshold)
     if force_macro:
@@ -31,9 +31,9 @@ def run(force_macro=False):
         print(f"BCOM/SP500 percentile: {macro_status['bcom_sp_pct']:.1f}%")
         print(f"BCOM/Gold percentile: {macro_status['bcom_gold_pct']:.1f}%")
         return
-    
+
     print("MACRO PASS: Commodities are cheap relative to stocks and gold.")
-    
+
     # 2. Sector scan
     sectors_cfg = cfg["sectors"]
     qualifying_sectors = []
@@ -45,11 +45,11 @@ def run(force_macro=False):
             qualifying_sectors.append(s)
         else:
             print(f"SECTOR FAIL: {s['name']} ({etf}) – not 'hated' enough.")
-    
+
     if not qualifying_sectors:
         print("No qualifying sectors. Exiting.")
         return
-    
+
     # 3. Stock-level screening
     results = []
     for sector_cfg in qualifying_sectors:
@@ -64,7 +64,7 @@ def run(force_macro=False):
                 current_spot = 1.0
         else:
             current_spot = 1.0
-        
+
         for ticker in sector_cfg["stocks"]:
             # fetch fundamentals (will cache)
             fund = data_fetcher.fetch_fundamentals(ticker)
@@ -72,16 +72,19 @@ def run(force_macro=False):
                 db.upsert_fundamentals(ticker, fund)
             # fetch shares history
             shares = data_fetcher.fetch_shares_history(ticker)
+
             # screen stock
             stock_result = stock.screen_stock(ticker, sector_name, current_spot)
             if not stock_result["fundamental_pass"]:
                 print(f"STOCK FAIL (fundamental): {ticker} ({sector_name})")
                 continue
+
             # technical check
             tech_pass, tech_stats = technical.technical_pass(ticker)
             if not tech_pass:
                 print(f"STOCK FAIL (technical): {ticker} ({sector_name})")
                 continue
+
             # If both fundamental and technical pass, it's a buy signal
             print(f"STOCK BUY: {ticker} ({sector_name}) – all screens passed.")
             results.append({
@@ -99,7 +102,7 @@ def run(force_macro=False):
             })
             # Save to DB
             db.save_result(results[-1])
-    
+
     print(f"Screener completed. {len(results)} stocks flagged as BUY.")
 
 if __name__ == "__main__":
