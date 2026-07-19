@@ -1,10 +1,18 @@
 """
 yfinance -- unofficial Yahoo Finance client.
-Used for all data fetching (Stooq is blocked on PythonAnywhere free tier).
+Uses curl_cffi session to mimic a real browser and avoid proxy blocks.
 """
 import time
 import pandas as pd
 import yfinance as yf
+
+try:
+    from curl_cffi import requests as curl_requests
+    _SESSION = curl_requests.Session(impersonate="chrome")
+    print("  Using curl_cffi session for yfinance")
+except Exception as e:
+    print(f"  curl_cffi not available, using default: {e}")
+    _SESSION = None
 
 def fetch_history(ticker: str, start_date: str = None, retries: int = 3, pause: float = 2.0):
     """
@@ -13,13 +21,20 @@ def fetch_history(ticker: str, start_date: str = None, retries: int = 3, pause: 
     """
     for attempt in range(retries):
         try:
-            # Use Ticker.history() – more reliable than yf.download()
-            t = yf.Ticker(ticker)
-            data = t.history(period="max", interval="1d", auto_adjust=False)
+            kwargs = {
+                "period": "max",
+                "interval": "1d",
+                "progress": False,
+                "auto_adjust": True,
+                "threads": False,
+            }
+            if _SESSION:
+                kwargs["session"] = _SESSION
+
+            data = yf.download(ticker, **kwargs)
             if data.empty:
                 raise ValueError("empty response")
 
-            # Use 'Close' column
             close = data.get("Close")
             if close is None:
                 close = data.get("Adj Close")
@@ -33,7 +48,6 @@ def fetch_history(ticker: str, start_date: str = None, retries: int = 3, pause: 
             if close.empty:
                 raise ValueError("no closes")
 
-            # Filter by start_date if provided
             if start_date:
                 close = close[close.index >= pd.to_datetime(start_date)]
 
