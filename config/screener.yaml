@@ -1,0 +1,31 @@
+macro:
+  commodity_index: "GSG"                # proxy for BCOM (iShares S&P GSCI)
+  stock_index: "^GSPC"
+  gold: "GC=F"
+  lookback_years: 20
+  cheap_percentile: 20                  # bottom 20% is cheap
+
+sectors:
+  # Each sector has an ETF ticker and a list of representative stocks
+  - name: "Uranium"
+    etf: "URA"
+    stocks: ["CCJ", "UUUU", "NXE", "DNN"]
+    cost_metric: "aisc"                 # not directly available; we use gross margin proxy
+  - name: "Oil & Gas"
+    etf: "XLE"
+    stocks: ["XOM", "CVX", "COP", "EOG"]
+  - name: "Coal"
+    etf: "KOL"
+    stocks: ["BTU", "ARCH", "AMR"]
+  # add more as needed
+
+screening:
+  min_years_history: 10
+  debt_ebitda_max: 2.5
+  pb_max: 3.0                           # price-to-book cap
+  ev_ebitda_max: 15.0
+  dilution_max: 0.05                    # 5% annual share growth
+  technical:
+    short_sma: 50
+    long_sma: 200
+    volume_multiplier: 1.5              # above average volume
