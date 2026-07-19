@@ -6,11 +6,8 @@ import time
 import pandas as pd
 import yfinance as yf
 
-try:
-    from curl_cffi import requests as curl_requests
-    _SESSION = curl_requests.Session(impersonate="chrome")
-except Exception:
-    _SESSION = None
+# Disable custom session – use yfinance's default
+_SESSION = None
 
 def fetch_history(ticker: str, period: str = "max", start_date: str = None, retries: int = 2, pause: float = 2.0):
     """
@@ -19,15 +16,14 @@ def fetch_history(ticker: str, period: str = "max", start_date: str = None, retr
     for attempt in range(retries + 1):
         try:
             if start_date:
-                kwargs = dict(start=start_date, interval="1d", progress=False, timeout=30)
+                kwargs = dict(start=start_date, interval="1d", progress=False, timeout=30, auto_adjust=True)
             else:
-                kwargs = dict(period=period, interval="1d", progress=False, timeout=30)
-            if _SESSION:
-                kwargs["session"] = _SESSION
+                kwargs = dict(period=period, interval="1d", progress=False, timeout=30, auto_adjust=True)
+            # Do not pass session – let yfinance use its own
             data = yf.download(ticker, **kwargs)
             if data is None or data.empty:
                 raise ValueError("empty response")
-            # Use 'Adj Close' if available (auto_adjust=True), else fallback to 'Close'
+            # Use 'Adj Close' if available, else 'Close'
             close = data.get("Adj Close")
             if close is None:
                 close = data.get("Close")
