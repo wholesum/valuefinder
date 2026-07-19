@@ -1,6 +1,6 @@
 """
 yfinance -- unofficial Yahoo Finance client.
-Used as fallback for commodities, futures, and any tickers Stooq can't handle.
+Used for all data fetching (Stooq is blocked on PythonAnywhere free tier).
 """
 import time
 import pandas as pd
@@ -13,20 +13,19 @@ def fetch_history(ticker: str, start_date: str = None, retries: int = 3, pause: 
     """
     for attempt in range(retries):
         try:
-            # Use Ticker.history() which is more reliable than yf.download()
+            # Use Ticker.history() – more reliable than yf.download()
             t = yf.Ticker(ticker)
             data = t.history(period="max", interval="1d", auto_adjust=False)
             if data.empty:
                 raise ValueError("empty response")
 
-            # Use 'Close' column (or 'Adj Close' if available)
+            # Use 'Close' column
             close = data.get("Close")
             if close is None:
                 close = data.get("Adj Close")
             if close is None:
                 raise ValueError("no close column")
 
-            # Ensure it's a Series
             if isinstance(close, pd.DataFrame):
                 close = close.iloc[:, 0]
 
@@ -46,7 +45,7 @@ def fetch_history(ticker: str, start_date: str = None, retries: int = 3, pause: 
         except Exception as e:
             print(f"  yfinance attempt {attempt+1}/{retries} failed for {ticker}: {e}")
             if attempt < retries - 1:
-                time.sleep(pause * (attempt + 1))  # exponential backoff
+                time.sleep(pause * (attempt + 1))
                 continue
             return None
     return None
