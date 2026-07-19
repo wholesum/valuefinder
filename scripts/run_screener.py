@@ -142,7 +142,9 @@ def run(force_macro=False):
                 rsi_overbought=tech_params.get("rsi_overbought", 70)
             )
             if not tech_pass:
-                print(f"STOCK FAIL (technical): {ticker} ({sector_name}) – RSI: {tech_stats.get('rsi'):.1f}, golden_cross: {tech_stats.get('golden_cross')}")
+                rsi_val = tech_stats.get('rsi')
+                rsi_str = f"{rsi_val:.1f}" if rsi_val is not None else "N/A"
+            print(f"STOCK FAIL (technical): {ticker} ({sector_name}) – RSI: {rsi_str}, golden_cross: {tech_stats.get('golden_cross')}")
                 continue
 
             print(f"STOCK BUY: {ticker} ({sector_name})")
