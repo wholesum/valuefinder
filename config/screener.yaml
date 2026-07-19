@@ -1,5 +1,5 @@
 # ==============================================================================
-# Value Screener – Configuration (Relaxed Thresholds)
+# Value Screener – Configuration (Final)
 # ==============================================================================
 
 macro:
@@ -15,220 +15,220 @@ sectors:
   - name: "Energy (S&P)"
     etf: "XLE"
     commodity_ticker: "CL=F"
-    stocks: ["XOM", "CVX", "COP", "EOG", "OXY", "PXD", "DVN"]
+    stocks: ["XOM", "CVX", "COP", "EOG", "OXY", "PXD", "DVN", "HES", "MRO", "APA"]
 
   - name: "Oil Exploration (E&P)"
     etf: "XOP"
     commodity_ticker: "CL=F"
-    stocks: ["EOG", "PXD", "DVN", "FANG", "MRO", "APA", "OVV"]
+    stocks: ["EOG", "PXD", "DVN", "FANG", "MRO", "APA", "OVV", "CHK", "RRC", "AR"]
 
   - name: "Oil Services"
     etf: "OIH"
     commodity_ticker: "CL=F"
-    stocks: ["SLB", "HAL", "BHGE", "NOV", "CHX"]
+    stocks: ["SLB", "HAL", "BHGE", "NOV", "CHX", "WFT", "FTI", "VAL"]
 
   - name: "Oil Equipment"
     etf: "IEZ"
     commodity_ticker: "CL=F"
-    stocks: ["SLB", "HAL", "NOV", "CHX"]
+    stocks: ["SLB", "HAL", "NOV", "CHX", "FTI"]
 
   - name: "Midstream Pipelines"
     etf: "AMLP"
     commodity_ticker: "NG=F"
-    stocks: ["EPD", "ET", "KMI", "WMB", "OKE", "MPLX"]
+    stocks: ["EPD", "ET", "KMI", "WMB", "OKE", "MPLX", "PAA", "ENB", "TRP"]
 
   - name: "Natural Gas Producers"
     etf: "FCG"
     commodity_ticker: "NG=F"
-    stocks: ["EQT", "RRC", "AR", "SWN", "COG", "CNX"]
+    stocks: ["EQT", "RRC", "AR", "SWN", "COG", "CNX", "GPOR", "CRK"]
 
   - name: "Refiners"
     etf: "CRAK"
     commodity_ticker: "CL=F"
-    stocks: ["VLO", "PSX", "MPC", "DINO", "WKC"]
+    stocks: ["VLO", "PSX", "MPC", "DINO", "WKC", "CVI", "PBF"]
 
   # ---- Uranium ----
   - name: "Uranium (Global X)"
     etf: "URA"
     commodity_ticker: "URA"
-    stocks: ["CCJ", "UUUU", "NXE", "DNN", "UEC", "LAM"]
+    stocks: ["CCJ", "UUUU", "NXE", "DNN", "UEC", "URNM", "BSENF", "PALAF"]
 
   - name: "Uranium Miners (Sprott)"
     etf: "URNM"
     commodity_ticker: "URA"
-    stocks: ["CCJ", "UUUU", "NXE", "DNN", "UEC"]
+    stocks: ["CCJ", "UUUU", "NXE", "DNN", "UEC", "URNM", "BSENF"]
 
   # ---- Metals & Mining ----
   - name: "Metals & Mining"
     etf: "XME"
     commodity_ticker: "HG=F"
-    stocks: ["FCX", "BHP", "RIO", "GLEN", "VALE", "TECK", "NEXA"]
+    stocks: ["FCX", "BHP", "RIO", "GLEN", "VALE", "TECK", "NEXA", "SCCO", "LUN", "HBM"]
 
   - name: "Global Miners"
     etf: "PICK"
     commodity_ticker: "HG=F"
-    stocks: ["BHP", "RIO", "GLEN", "VALE", "FCX", "TECK"]
+    stocks: ["BHP", "RIO", "GLEN", "VALE", "FCX", "TECK", "NEXA", "SCCO"]
 
   - name: "Copper Miners"
     etf: "COPX"
     commodity_ticker: "HG=F"
-    stocks: ["FCX", "BHP", "RIO", "GLEN", "VALE", "TECK", "LUN", "SCCO"]
+    stocks: ["FCX", "BHP", "RIO", "GLEN", "VALE", "TECK", "LUN", "SCCO", "HBM"]
 
   - name: "Silver Miners"
     etf: "SIL"
     commodity_ticker: "SI=F"
-    stocks: ["AG", "PAAS", "FSM", "HL", "CDE"]
+    stocks: ["AG", "PAAS", "FSM", "HL", "CDE", "GPL", "SILV", "MAG"]
 
   - name: "Junior Silver Miners"
     etf: "SILJ"
     commodity_ticker: "SI=F"
-    stocks: ["AG", "PAAS", "FSM", "HL"]
+    stocks: ["AG", "PAAS", "FSM", "HL", "GPL", "SILV", "MAG"]
 
   - name: "Gold Miners"
     etf: "GDX"
     commodity_ticker: "GC=F"
-    stocks: ["NEM", "GOLD", "ABX", "AEM", "KGC", "IAG"]
+    stocks: ["NEM", "GOLD", "ABX", "AEM", "KGC", "IAG", "YRI", "EDVMF", "OR"]
 
   - name: "Junior Gold Miners"
     etf: "GDXJ"
     commodity_ticker: "GC=F"
-    stocks: ["KGC", "IAG", "HL", "CDE"]
+    stocks: ["KGC", "IAG", "HL", "CDE", "GPL", "SILV", "MAG", "NG", "DRD"]
 
   - name: "Junior Gold Explorers"
     etf: "GOEX"
     commodity_ticker: "GC=F"
-    stocks: ["KGC", "IAG", "HL"]
+    stocks: ["KGC", "IAG", "HL", "GPL", "NG", "DRD"]
 
   - name: "Rare Earths"
     etf: "REMX"
     commodity_ticker: null
-    stocks: ["MP", "LYSCF", "TMRC", "REE", "NMREF"]
+    stocks: ["MP", "LYSCF", "TMRC", "REE", "NMREF", "ARRAF", "VREMF"]
 
   - name: "Lithium"
     etf: "LIT"
     commodity_ticker: null
-    stocks: ["ALB", "SQM", "LAC", "PLL", "SGML"]
+    stocks: ["ALB", "SQM", "LAC", "PLL", "SGML", "LTHM", "NVO", "ION"]
 
   - name: "Battery Materials"
     etf: "BATT"
     commodity_ticker: "HG=F"
-    stocks: ["ALB", "SQM", "LAC", "BHP", "RIO", "FCX"]
+    stocks: ["ALB", "SQM", "LAC", "BHP", "RIO", "FCX", "NVO", "ION"]
 
   - name: "Steel"
     etf: "SLX"
     commodity_ticker: "HRC=F"
-    stocks: ["NUE", "STLD", "X", "MT", "CLF", "CMC"]
+    stocks: ["NUE", "STLD", "X", "MT", "CLF", "CMC", "RS", "TX"]
 
   - name: "Agriculture/Fertilizer"
     etf: "MOO"
     commodity_ticker: "ZS=F"
-    stocks: ["DE", "ADM", "CF", "MOS", "NTR", "BG", "CTVA"]
+    stocks: ["DE", "ADM", "CF", "MOS", "NTR", "BG", "CTVA", "NTR", "FMC"]
 
   # ---- Real Estate & Construction ----
   - name: "US REITs"
     etf: "VNQ"
     commodity_ticker: "LBR=F"
-    stocks: ["PLD", "PSA", "SPG", "WELL", "AVB", "EQR", "VTR", "ESS"]
+    stocks: ["PLD", "PSA", "SPG", "WELL", "AVB", "EQR", "VTR", "ESS", "MAA", "UDR"]
 
   - name: "Residential REITs"
     etf: "REZ"
     commodity_ticker: "LBR=F"
-    stocks: ["AVB", "EQR", "ESS", "MAA", "UDR", "INVH"]
+    stocks: ["AVB", "EQR", "ESS", "MAA", "UDR", "INVH", "SUI", "AMH"]
 
   - name: "Global Real Estate"
     etf: "REET"
     commodity_ticker: null
-    stocks: ["PLD", "PSA", "SPG", "WELL", "AVB", "EQR", "VTR"]
+    stocks: ["PLD", "PSA", "SPG", "WELL", "AVB", "EQR", "VTR", "ESS"]
 
   - name: "Homebuilders"
     etf: "ITB"
     commodity_ticker: "LBR=F"
-    stocks: ["DHI", "LEN", "NVR", "PHM", "TOL", "MTH"]
+    stocks: ["DHI", "LEN", "NVR", "PHM", "TOL", "MTH", "KBH", "TMHC"]
 
   - name: "Homebuilders 2"
     etf: "XHB"
     commodity_ticker: "LBR=F"
-    stocks: ["DHI", "LEN", "NVR", "PHM", "TOL"]
+    stocks: ["DHI", "LEN", "NVR", "PHM", "TOL", "MTH", "KBH"]
 
   - name: "Timber & Forestry"
     etf: "WOOD"
     commodity_ticker: "LBR=F"
-    stocks: ["WY", "WPC", "RYN"]
+    stocks: ["WY", "WPC", "RYN", "PCH", "RFP"]
 
   # ---- Materials ----
   - name: "Materials (S&P)"
     etf: "XLB"
     commodity_ticker: "HG=F"
-    stocks: ["SHW", "DD", "DOW", "LYB", "NUE", "ECL"]
+    stocks: ["SHW", "DD", "DOW", "LYB", "NUE", "ECL", "PPG", "APD"]
 
   - name: "Global Materials"
     etf: "MXI"
     commodity_ticker: "HG=F"
-    stocks: ["BHP", "RIO", "GLEN", "VALE", "FCX", "SHW"]
+    stocks: ["BHP", "RIO", "GLEN", "VALE", "FCX", "SHW", "DD", "DOW"]
 
   # ---- Utilities ----
   - name: "Electric Utilities"
     etf: "XLU"
     commodity_ticker: "NG=F"
-    stocks: ["NEE", "DUK", "SO", "D", "AEP", "EXC", "SRE"]
+    stocks: ["NEE", "DUK", "SO", "D", "AEP", "EXC", "SRE", "PEG", "WEC"]
 
   - name: "Electric Grid"
     etf: "GRID"
     commodity_ticker: "HG=F"
-    stocks: ["NEE", "D", "DUK", "SO", "ETR", "PPL"]
+    stocks: ["NEE", "D", "DUK", "SO", "ETR", "PPL", "AEP", "EXC"]
 
   - name: "Clean Energy"
     etf: "ICLN"
     commodity_ticker: null
-    stocks: ["NEE", "ENPH", "SEDG", "CSIQ", "FSLR", "BEP"]
+    stocks: ["NEE", "ENPH", "SEDG", "CSIQ", "FSLR", "BEP", "TAN"]
 
   - name: "Solar"
     etf: "TAN"
     commodity_ticker: null
-    stocks: ["ENPH", "SEDG", "FSLR", "CSIQ", "RUN"]
+    stocks: ["ENPH", "SEDG", "FSLR", "CSIQ", "RUN", "SPWR", "ARRY"]
 
   - name: "Water Resources"
     etf: "PHO"
     commodity_ticker: null
-    stocks: ["XYL", "AWK", "WTRG", "AWR"]
+    stocks: ["XYL", "AWK", "WTRG", "AWR", "CNI", "MSEX"]
 
   # ---- Country ETFs as commodity plays ----
   - name: "Canada (Commodity)"
     etf: "EWC"
     commodity_ticker: "CL=F"
-    stocks: ["CNQ", "SU", "CVE", "MEG", "BTE", "ENB"]
+    stocks: ["CNQ", "SU", "CVE", "MEG", "BTE", "ENB", "TRP", "PPL"]
 
   - name: "Australia (Commodity)"
     etf: "EWA"
     commodity_ticker: "TIO=F"
-    stocks: ["BHP", "RIO", "FMG", "BPT", "WDS", "WPL"]
+    stocks: ["BHP", "RIO", "FMG", "BPT", "WDS", "WPL", "STO", "S32"]
 
   - name: "Brazil (Commodity)"
     etf: "EWZ"
     commodity_ticker: "ZS=F"
-    stocks: ["VALE", "PBR", "B3", "ITUB", "BSBR", "ABEV"]
+    stocks: ["VALE", "PBR", "B3", "ITUB", "BSBR", "ABEV", "PETR4", "VALE3"]
 
   - name: "Chile (Copper)"
     etf: "ECH"
     commodity_ticker: "HG=F"
-    stocks: ["SQM", "ANTO", "BHP", "RIO", "VALE"]
+    stocks: ["SQM", "ANTO", "BHP", "RIO", "VALE", "CODELCO"]
 
   - name: "South Africa (Gold/Platinum)"
     etf: "EZA"
     commodity_ticker: "GC=F"
-    stocks: ["SIB", "GFI", "ANG", "IMP", "SGL", "AGL"]
+    stocks: ["SIB", "GFI", "ANG", "IMP", "SGL", "AGL", "HMY", "DRD"]
 
 # ------------------------------------------------------------------ screening --
 screening:
   min_years_history: 10
-  debt_equity_max: 5.0                     # raised from 3.0
-  pb_max: 5.0                              # raised from 3.0
-  ev_ebitda_max: 20.0                      # raised from 15.0
-  pe_max: 50.0                             # raised from 25.0
-  pfcf_max: 50.0                           # raised from 30.0
-  roe_min: 0.05                            # lowered from 0.10
-  fcf_yield_min: 0.02                      # lowered from 0.04
-  dilution_max: 0.10                       # raised from 0.05 (10% annual dilution acceptable)
+  debt_equity_max: 200.0       # radically relaxed for miners/cyclicals
+  pb_max: 10.0                 # relaxed
+  ev_ebitda_max: 50.0          # relaxed
+  pe_max: 100.0                # relaxed
+  pfcf_max: 100.0              # relaxed
+  roe_min: -1.0                # allow negative ROE in down cycle
+  fcf_yield_min: -0.5          # allow negative FCF yield
+  dilution_max: 0.25           # 25% annual dilution allowed (common in mining)
   technical:
     short_sma: 50
     long_sma: 200
