@@ -77,22 +77,22 @@ sectors:
   - name: "Silver Miners"
     etf: "SIL"
     commodity_ticker: "SI=F"
-    stocks: ["AG", "PAAS", "FSM", "HL", "CDE", "GPL", "SILV", "MAG"]
+    stocks: ["AG", "PAAS", "FSM", "HL", "CDE", "SILV"]
 
   - name: "Junior Silver Miners"
     etf: "SILJ"
     commodity_ticker: "SI=F"
-    stocks: ["AG", "PAAS", "FSM", "HL", "GPL", "SILV", "MAG"]
+    stocks: ["AG", "PAAS", "FSM", "HL", "SILV"]
 
   - name: "Gold Miners"
     etf: "GDX"
     commodity_ticker: "GC=F"
-    stocks: ["NEM", "GOLD", "ABX", "AEM", "KGC", "IAG", "YRI", "EDVMF", "OR"]
+    stocks: ["NEM", "GOLD", "ABX", "AEM", "KGC", "IAG", "OR", "EDVMF"]
 
   - name: "Junior Gold Miners"
     etf: "GDXJ"
     commodity_ticker: "GC=F"
-    stocks: ["KGC", "IAG", "HL", "CDE", "GPL", "SILV", "MAG", "NG", "DRD"]
+    stocks: ["KGC", "IAG", "HL", "NG", "DRD"]
 
   - name: "Junior Gold Explorers"
     etf: "GOEX"
