@@ -21,7 +21,6 @@ def run(force_macro=False):
 
     # Debug: print the top-level keys
     print("Config keys:", list(cfg.keys()))
-
     # Debug: print the raw sectors value
     print("Raw sectors value:", cfg.get("sectors"))
 
@@ -145,7 +144,7 @@ def run(force_macro=False):
                 rsi_val = tech_stats.get('rsi')
                 rsi_str = f"{rsi_val:.1f}" if rsi_val is not None else "N/A"
                 print(f"STOCK FAIL (technical): {ticker} ({sector_name}) – RSI: {rsi_str}, golden_cross: {tech_stats.get('golden_cross')}")
-            continue
+                continue
 
             print(f"STOCK BUY: {ticker} ({sector_name})")
             results.append({
