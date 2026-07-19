@@ -1,5 +1,5 @@
 """
-Stock-level filters with safe conversion and extreme value handling.
+Stock-level filters with safe conversion and relaxed thresholds.
 """
 from . import db
 
@@ -26,7 +26,7 @@ def cost_filter(ticker, commodity_spot_price, margin_threshold=0.0):
         return True, None
     return gm > margin_threshold, gm
 
-def debt_filter(ticker, max_debt_equity=5.0):
+def debt_filter(ticker, max_debt_equity=200.0):
     fund = get_fund(ticker)
     if fund is None:
         return True, None
@@ -35,7 +35,7 @@ def debt_filter(ticker, max_debt_equity=5.0):
         return True, None
     return debt_eq <= max_debt_equity, debt_eq
 
-def dilution_filter(ticker, max_yoy=0.10):
+def dilution_filter(ticker, max_yoy=0.25):
     shares_hist = db.get_shares_history(ticker, years=3)
     if len(shares_hist) < 2:
         return True, None
@@ -44,13 +44,12 @@ def dilution_filter(ticker, max_yoy=0.10):
     if oldest <= 0:
         return True, None
     annual_growth = (newest / oldest) ** (1 / (len(shares_hist)/252)) - 1
-    # Cap extreme values (likely data errors) – treat as None (skip check)
-    if abs(annual_growth) > 10.0:  # >1000% growth is unrealistic
+    if abs(annual_growth) > 10.0:  # skip extreme errors
         return True, None
     return annual_growth <= max_yoy, annual_growth
 
-def value_filter(ticker, pb_max=5.0, ev_ebitda_max=20.0, pe_max=50.0,
-                 pfcf_max=50.0, roe_min=0.05, fcf_yield_min=0.02):
+def value_filter(ticker, pb_max=10.0, ev_ebitda_max=50.0, pe_max=100.0,
+                 pfcf_max=100.0, roe_min=-1.0, fcf_yield_min=-0.5):
     fund = get_fund(ticker)
     if not fund:
         return True, {}
@@ -84,14 +83,13 @@ def screen_stock(ticker, sector, commodity_spot_price):
     dil_pass, dil_val = dilution_filter(ticker)
     value_pass, value_metrics = value_filter(ticker)
 
-    # Composite score
     score = 0
     count = 0
     if value_metrics.get("pb") is not None:
-        score += value_metrics["pb"] / 5.0
+        score += value_metrics["pb"] / 10.0
         count += 1
     if value_metrics.get("ev") is not None:
-        score += value_metrics["ev"] / 20.0
+        score += value_metrics["ev"] / 50.0
         count += 1
     value_score = score / count if count > 0 else None
 
